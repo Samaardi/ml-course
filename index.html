@@ -1,0 +1,510 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Flashcards for the machine learning course: intro to ML, unsupervised learning, K-means, algorithms, seeds and random_state.">
+<title>K-means &amp; Seeds Flashcards</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='3' y='6' width='26' height='20' rx='4' fill='%232F5D8A'/%3E%3Ccircle cx='11' cy='16' r='3' fill='%23fff'/%3E%3Ccircle cx='21' cy='13' r='2.2' fill='%23fff'/%3E%3Ccircle cx='20' cy='20' r='2.2' fill='%23fff'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one study card centred under a filter bar; each deck is coloured like a cluster label. */
+:root {
+  --bg: #F2F4F7;
+  --surface: #FFFFFF;
+  --surface-2: #E8ECF1;
+  --ink: #16202B;
+  --muted: #586574;
+  --line: #D6DDE5;
+  --accent: #2F5D8A;
+  --good: #2F7A55;
+  --again: #B4492A;
+  --c-ml: #2F5D8A;
+  --c-uml: #2F7A55;
+  --c-kmeans: #B4492A;
+  --c-algo: #6E4FA3;
+  --c-seed: #946C0E;
+  --shadow: 0 1px 2px rgba(22,32,43,.06), 0 8px 24px rgba(22,32,43,.08);
+  --f-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-body: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --f-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0F151C; --surface: #18212B; --surface-2: #212C38; --ink: #E6ECF2; --muted: #9AA8B6; --line: #2B3745;
+    --accent: #7FAEDD; --good: #6CC193; --again: #F08A68;
+    --c-ml: #7FAEDD; --c-uml: #6CC193; --c-kmeans: #F08A68; --c-algo: #B79BE6; --c-seed: #E2B94D;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 10px 28px rgba(0,0,0,.35);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0F151C; --surface: #18212B; --surface-2: #212C38; --ink: #E6ECF2; --muted: #9AA8B6; --line: #2B3745;
+  --accent: #7FAEDD; --good: #6CC193; --again: #F08A68;
+  --c-ml: #7FAEDD; --c-uml: #6CC193; --c-kmeans: #F08A68; --c-algo: #B79BE6; --c-seed: #E2B94D;
+  --shadow: 0 1px 2px rgba(0,0,0,.3), 0 10px 28px rgba(0,0,0,.35);
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--ink);
+  font-family: var(--f-body); font-size: 16px; line-height: 1.5;
+}
+.wrap {
+  max-width: 760px; margin: 0 auto;
+  padding-block: 28px 48px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: flex; flex-direction: column; gap: 20px;
+}
+header { display: flex; flex-direction: column; gap: 6px; }
+.eyebrow { font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+h1 { font-family: var(--f-display); font-weight: 700; font-size: clamp(28px, 5vw, 38px); line-height: 1.1; margin: 0; text-wrap: balance; }
+.lede { margin: 0; color: var(--muted); max-width: 60ch; }
+
+/* filters */
+.filters { display: flex; flex-direction: column; gap: 10px; }
+.chiprow { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.rowlabel { font-size: 12px; color: var(--muted); letter-spacing: .06em; text-transform: uppercase; font-weight: 600; margin-right: 4px; }
+.chip {
+  font: 500 14px/1 var(--f-body); color: var(--ink);
+  background: var(--surface); border: 1px solid var(--line); border-radius: 999px;
+  padding: 8px 12px; cursor: pointer; display: inline-flex; align-items: center; gap: 8px;
+}
+.chip .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--c); flex: none; }
+.chip .n { color: var(--muted); font-variant-numeric: tabular-nums; font-size: 12px; }
+.chip[aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.chip[aria-pressed="true"] .n { color: inherit; opacity: .7; }
+.chip:focus-visible, .btn:focus-visible, .card:focus-visible, .seg button:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+
+.toolbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: space-between; }
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; background: var(--surface); }
+.seg button { font: 500 14px/1 var(--f-body); color: var(--muted); background: none; border: 0; padding: 9px 14px; cursor: pointer; }
+.seg button[aria-pressed="true"] { background: var(--surface-2); color: var(--ink); }
+.tools { display: flex; flex-wrap: wrap; gap: 8px; }
+.btn {
+  font: 500 14px/1 var(--f-body); color: var(--ink); background: var(--surface);
+  border: 1px solid var(--line); border-radius: 10px; padding: 9px 14px; cursor: pointer;
+  display: inline-flex; align-items: center; gap: 6px;
+}
+.btn[aria-pressed="true"] { border-color: var(--accent); color: var(--accent); }
+.btn:disabled { opacity: .45; cursor: default; }
+
+/* progress */
+.progress { display: flex; flex-direction: column; gap: 6px; }
+.progress .meta { display: flex; justify-content: space-between; font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums; gap: 12px; flex-wrap: wrap; }
+.bar { height: 6px; background: var(--surface-2); border-radius: 99px; overflow: hidden; display: flex; }
+.bar span { display: block; height: 100%; transition: width .3s ease; }
+.bar .k { background: var(--good); }
+.bar .a { background: var(--again); }
+
+/* card */
+.stage { perspective: 1400px; }
+.card {
+  display: grid; cursor: pointer; position: relative;
+  transform-style: preserve-3d; transition: transform .5s cubic-bezier(.2,.7,.2,1);
+  border-radius: 18px; outline: none;
+}
+.card.flipped { transform: rotateY(180deg); }
+.face {
+  grid-area: 1 / 1; backface-visibility: hidden; -webkit-backface-visibility: hidden;
+  background: var(--surface); border: 1px solid var(--line); border-radius: 18px; box-shadow: var(--shadow);
+  min-height: 320px; padding: 22px 26px 26px; display: flex; flex-direction: column; gap: 16px;
+  border-top: 5px solid var(--c);
+}
+.face.back { transform: rotateY(180deg); }
+.facehead { display: flex; justify-content: space-between; align-items: center; gap: 12px; font-size: 12px; color: var(--muted); letter-spacing: .06em; text-transform: uppercase; font-weight: 600; }
+.facehead .deck { display: inline-flex; align-items: center; gap: 8px; color: var(--c); }
+.facehead .deck::before { content: ""; width: 9px; height: 9px; border-radius: 50%; background: var(--c); }
+.facehead .num { font-variant-numeric: tabular-nums; }
+.q { font-family: var(--f-display); font-weight: 500; font-size: clamp(22px, 4vw, 28px); line-height: 1.25; margin: auto 0; text-wrap: balance; }
+.a { font-size: 17px; line-height: 1.6; margin: auto 0; min-width: 0; overflow-wrap: anywhere; }
+.a p { margin: 0 0 10px; }
+.a p:last-child { margin-bottom: 0; }
+.a ul { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 4px; }
+.hint { font-size: 13px; color: var(--muted); }
+.side-tag { font-family: var(--f-mono); font-size: 12px; }
+code, .mono { font-family: var(--f-mono); font-size: .9em; background: var(--surface-2); padding: 1px 5px; border-radius: 5px; }
+.formula { font-family: var(--f-mono); font-size: .95em; display: block; background: var(--surface-2); padding: 8px 12px; border-radius: 8px; margin: 4px 0; overflow-x: auto; white-space: nowrap; }
+
+.controls { display: grid; grid-template-columns: auto 1fr 1fr auto; gap: 10px; align-items: stretch; }
+.controls .btn { justify-content: center; padding: 12px 14px; font-size: 15px; }
+.btn.again { color: var(--again); border-color: color-mix(in srgb, var(--again) 45%, var(--line)); }
+.btn.good { color: var(--good); border-color: color-mix(in srgb, var(--good) 45%, var(--line)); }
+.keys { font-size: 12px; color: var(--muted); text-align: center; }
+.keys kbd { font-family: var(--f-mono); font-size: 11px; border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 4px; padding: 0 5px; background: var(--surface); }
+
+.empty { background: var(--surface); border: 1px dashed var(--line); border-radius: 18px; padding: 40px 24px; text-align: center; display: flex; flex-direction: column; gap: 12px; align-items: center; }
+.empty h2 { font-family: var(--f-display); margin: 0; font-size: 24px; }
+.empty p { margin: 0; color: var(--muted); }
+
+/* list view */
+.list { display: flex; flex-direction: column; gap: 10px; }
+.item { background: var(--surface); border: 1px solid var(--line); border-left: 4px solid var(--c); border-radius: 12px; padding: 14px 18px; display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1.3fr); gap: 18px; }
+.item .iq { font-weight: 600; }
+.item .ia { color: var(--ink); min-width: 0; overflow-wrap: anywhere; }
+.item .ia p { margin: 0 0 6px; }
+.item .ia p:last-child { margin: 0; }
+.item .ia ul { margin: 0; padding-left: 18px; }
+.item .state { font-size: 12px; color: var(--muted); grid-column: 1 / -1; display: flex; gap: 10px; }
+.item .state b { font-weight: 600; }
+.item .state .k { color: var(--good); }
+.item .state .x { color: var(--again); }
+
+footer { font-size: 13px; color: var(--muted); border-top: 1px solid var(--line); padding-top: 14px; display: flex; flex-wrap: wrap; gap: 8px 16px; justify-content: space-between; }
+footer button { font: inherit; color: var(--muted); background: none; border: 0; padding: 0; text-decoration: underline; cursor: pointer; }
+
+@media (max-width: 560px) {
+  .face { padding: 18px 18px 22px; min-height: 300px; }
+  .controls { grid-template-columns: 1fr 1fr; }
+  .controls .prev { order: 3; } .controls .next { order: 4; }
+  .item { grid-template-columns: 1fr; gap: 8px; }
+  .keys { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .card { transition: none; }
+  .bar span { transition: none; }
+}
+</style>
+<style>body{margin:0} [hidden]{display:none!important} img{max-width:100%}</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Machine learning · Sessions 1 &amp; 2</div>
+    <h1>K-means &amp; Seeds Flashcards</h1>
+    <p class="lede">Review the ideas from our first two lessons. Read the question, answer it in your head, then flip the card and be honest about whether you knew it.</p>
+  </header>
+
+  <section class="filters" aria-label="Choose cards">
+    <div class="chiprow" id="decks"></div>
+  </section>
+
+  <div class="toolbar">
+    <div class="seg" role="group" aria-label="View">
+      <button id="v-study" aria-pressed="true">Study</button>
+      <button id="v-list" aria-pressed="false">All cards</button>
+    </div>
+    <div class="tools">
+      <button class="btn" id="shuffle" aria-pressed="false">Shuffle</button>
+      <button class="btn" id="missed" aria-pressed="false">Only “review again”</button>
+    </div>
+  </div>
+
+  <div class="progress">
+    <div class="meta"><span id="pcount"></span><span id="pstat"></span></div>
+    <div class="bar" aria-hidden="true"><span class="k" id="bk"></span><span class="a" id="ba"></span></div>
+  </div>
+
+  <main id="study">
+    <div class="stage" id="stage"></div>
+  </main>
+  <main id="listview" hidden><div class="list" id="list"></div></main>
+
+  <footer>
+    <span>Your progress is saved in this browser only.</span>
+    <button id="reset">Reset my progress</button>
+  </footer>
+</div>
+
+<script>
+const DECKS = [
+  { id: "ml",     name: "What is ML?",          session: 1 },
+  { id: "uml",    name: "Unsupervised learning", session: 1 },
+  { id: "kmeans", name: "K-means",               session: 1 },
+  { id: "algo",   name: "Algorithms",            session: 2 },
+  { id: "seed",   name: "Seeds & random_state",  session: 2 },
+];
+
+// q = question, a = answer. Inline markup: `code`, **bold**, blank line = new paragraph, "- " lines = list.
+const CARDS = [
+  // ---- What is ML? ----
+  ["ml", "What is machine learning?", "A way to make computers learn the rules from examples instead of being given them.\n\nTraditional programming: rules + data → answers.\nMachine learning: data + answers → rules."],
+  ["ml", "Tom Mitchell’s definition of learning uses three letters: T, E and P. What do they stand for?", "A program learns if its performance **P** on a task **T** improves with experience **E**.\n\n- T: what the program must do\n- E: the data it learns from\n- P: how we measure success"],
+  ["ml", "Name T, E and P for a spam filter.", "- T: label each email as spam or not spam\n- E: emails that users already flagged\n- P: % of new emails labelled correctly"],
+  ["ml", "When should you **not** use machine learning?", "When a formula already works (tax calculation), when there is no data to learn from, or when every decision must follow a written rule."],
+  ["ml", "What are the three learning paradigms?", "- **Supervised**: data comes with answers (labels)\n- **Unsupervised**: no answers; find structure\n- **Reinforcement**: learn by trial and reward"],
+  ["ml", "Classification vs regression: what is the difference?", "Both are supervised.\n\n**Classification** predicts a category (spam / not spam). **Regression** predicts a number (a house price)."],
+  ["ml", "What is self-supervised learning?", "Learning where the labels are made from the data itself. Large language models predict the next word, so the text supplies its own answers."],
+  ["ml", "Which paradigm and task? Predict tomorrow’s temperature from past weather.", "Supervised learning, regression (the answer is a number)."],
+  ["ml", "Which paradigm and task? Find unusual bank transactions with no fraud labels.", "Unsupervised learning, anomaly detection."],
+  ["ml", "Feature vs label?", "A **feature** is one measurable property, a column of the data.\n\nA **label** is the answer column in supervised learning."],
+  ["ml", "Parameter vs hyperparameter? Give the K-means example.", "A **parameter** is learned by the algorithm: the centroid positions.\n\nA **hyperparameter** is chosen by you before training: K."],
+  ["ml", "What is generalization?", "Doing well on data the model has never seen. It is the real goal of ML."],
+  ["ml", "Overfitting vs underfitting?", "**Overfitting**: the model memorizes noise, so it looks great on training data and does poorly on new data.\n\n**Underfitting**: the model is too simple to capture the pattern."],
+  ["ml", "In a typical ML workflow, where does most of the effort go?", "Before training: collecting, cleaning and preparing the data. For K-means, a missing scaling step can make it fail completely."],
+
+  // ---- Unsupervised learning ----
+  ["uml", "What is unsupervised learning?", "Finding structure in data that has no answer key (no labels)."],
+  ["uml", "Why do we need unsupervised learning? Give two reasons.", "- Labels are expensive: millions of medical scans exist, few are labelled by a radiologist.\n- The answer is unknown: a company doesn’t know its customer segments in advance."],
+  ["uml", "Unsupervised learning answers four kinds of questions. Name them.", "- **Clustering**: which points belong together?\n- **Dimensionality reduction**: fewer variables, same information?\n- **Anomaly detection**: which points don’t fit?\n- **Association rules**: which items occur together?"],
+  ["uml", "What is clustering?", "Grouping data points so that points in the same group are more alike than points in other groups."],
+  ["uml", "Every clustering method makes two choices. What are they?", "1. How to measure **similarity** (usually a distance; K-means uses Euclidean).\n\n2. What **shape** a cluster has: a ball around a centre, a dense region, or a nested tree."],
+  ["uml", "Hard vs soft clustering?", "**Hard**: each point belongs to exactly one cluster (K-means).\n\n**Soft**: each point gets a probability for each cluster (Gaussian mixtures)."],
+  ["uml", "A deck of cards can be grouped by suit, by colour, or into face cards vs the rest. Which grouping is correct?", "All of them. With no answer key, “correct” depends on what you need the groups for."],
+  ["uml", "What are the three ways to judge clusters?", "- **Internal**: uses only the data (inertia, silhouette)\n- **External**: needs true labels to compare (adjusted Rand index)\n- **Usefulness**: can someone act on the clusters?\n\nIn practice, usefulness matters most."],
+
+  // ---- K-means ----
+  ["kmeans", "Explain K-means with the pizza-shop analogy.", "Open K pizza shops anywhere in the city. Each house picks its nearest shop. Each shop moves to the centre of its customers. Repeat until no shop moves."],
+  ["kmeans", "Which two steps does K-means repeat?", "1. **Assign**: each point joins its nearest centroid.\n\n2. **Update**: each centroid moves to the mean of its points."],
+  ["kmeans", "What is a centroid?", "The centre of a cluster: the mean (average) of all points in it."],
+  ["kmeans", "What does K-means minimize?", "Inertia, also called the within-cluster sum of squares (WCSS):\n\n`J = Σₖ Σ ‖x − μₖ‖²`\n\nThe total squared distance from every point to its own cluster’s centroid."],
+  ["kmeans", "How do you compute the Euclidean distance between (1, 1) and (4, 5)?", "Square root of the sum of squared differences per feature:\n\n√((4−1)² + (5−1)²) = √(9 + 16) = √25 = **5**"],
+  ["kmeans", "When does K-means stop?", "When no point changes cluster, when the centroids move less than a small tolerance, or when `max_iter` is reached (300 by default)."],
+  ["kmeans", "Why is K-means guaranteed to stop?", "Each step can only lower J or keep it the same, and there are only finitely many ways to split the points. So no split can repeat, and the loop must end."],
+  ["kmeans", "Does K-means always find the best clustering?", "No. It stops at a **local minimum**. Finding the global best is NP-hard, so the starting centroids matter."],
+  ["kmeans", "Worked example: P1 = (1, 1) and P3 = (1, 2) are the only points in cluster 1. Where does c1 move?", "To their mean: ((1+1)/2, (1+2)/2) = **(1, 1.5)**."],
+  ["kmeans", "Worked example (8 points, K = 2, bad start). What were the final centroids and inertia?", "c1 = (1.5, 1.75), c2 = (6.75, 5.75).\n\nInertia fell from 191 to **9.25** (3.75 + 5.50) in three iterations."],
+  ["kmeans", "What does k-means++ do?", "It spreads the starting centroids apart: each next centroid is picked with probability proportional to its squared distance from the nearest centroid already chosen. It is scikit-learn’s default."],
+  ["kmeans", "What does `n_init` do?", "Runs K-means several times from different starts and keeps the run with the lowest inertia. It protects against one unlucky start."],
+  ["kmeans", "Why can’t inertia alone tell you the best K?", "Inertia always falls as K grows. With K = number of points, it reaches 0, which is useless."],
+  ["kmeans", "How does the elbow method choose K?", "Plot inertia against K. Inertia drops sharply, then flattens. The K at the bend (the elbow) is a good choice."],
+  ["kmeans", "What is the silhouette score?", "`s = (b − a) / max(a, b)`\n\n- a: mean distance to points in its own cluster\n- b: mean distance to the nearest other cluster\n\nIt ranges from −1 to 1; higher is better. In our demo it peaked at 0.83 for K = 4."],
+  ["kmeans", "Features are age (years) and income (euros). What must you do before K-means, and why?", "**Standardize** the features (e.g. `StandardScaler`).\n\nIncome is about 1,000 times larger, so it dominates every distance. In our demo the adjusted Rand index was 0.0 on raw features and 1.0 after scaling."],
+  ["kmeans", "Why does K-means fail on the “two moons” dataset? What could you use instead?", "K-means draws straight boundaries and assumes round clusters, so it cuts each moon in half. DBSCAN or spectral clustering can follow the curved shape."],
+  ["kmeans", "Name three other weaknesses of K-means and an alternative for each.", "- **Outliers** pull the mean → K-medoids\n- **Categorical data** has no mean → K-modes\n- **Many dimensions** make distances similar → PCA, then cluster\n- **Unknown K** → hierarchical clustering, DBSCAN"],
+  ["kmeans", "Two runs of K-means give different clusters. Why, and what do you do?", "Different random starts reach different local minima. Use k-means++ with several restarts (`n_init`), and set `random_state` if you need the same result every time."],
+
+  // ---- Algorithms ----
+  ["algo", "What is an algorithm?", "A finite list of precise steps that turns an input into an output. Like a recipe that anyone, or any machine, can follow and get the same result."],
+  ["algo", "Name the five properties of an algorithm.", "- **Input**: zero or more inputs\n- **Output**: at least one result\n- **Definiteness**: every step is exact\n- **Finiteness**: it stops after a finite number of steps\n- **Effectiveness**: every step can actually be carried out"],
+  ["algo", "In the tea algorithm, which property does “Boil 250 ml of water” fix that “Boil some water” breaks?", "**Definiteness**: every step must be exact and leave nothing to guess."],
+  ["algo", "Which of these is **not** a property of an algorithm: finiteness, definiteness, randomness, output?", "**Randomness.** Algorithms may use randomness, but it isn’t a defining property."],
+  ["algo", "Algorithm vs program vs model?", "- **Algorithm**: the idea, the steps (“assign, update, repeat”)\n- **Program**: the algorithm written in a language (scikit-learn’s `KMeans`)\n- **Model**: the numbers you get after running a learning algorithm on data (the centroids)\n\nRecipe → recipe written in Persian → the cake you baked."],
+  ["algo", "Looking up a word in a paper dictionary (open in the middle, go left or right, repeat) is which algorithm?", "**Binary search.**"],
+  ["algo", "Why are there many algorithms for the same problem?", "They differ in speed, memory and quality, and each assumes different things about the data. Choosing an algorithm means choosing a set of assumptions."],
+  ["algo", "After `km = KMeans(4)` and before `km.fit(X)`, does `km` contain learned centroids?", "No. Creating the object only stores your settings. `fit` does the learning."],
+  ["algo", "What happens, in order, inside `KMeans(...).fit(X)`?", "1. Check the input (2-D numbers, no missing values)\n2. Turn `random_state` into a random number generator\n3. Pick starting centroids with k-means++\n4. Loop: assign, update, until converged\n5. Repeat 3–4 `n_init` times, keep the lowest inertia\n6. Store the results"],
+  ["algo", "What does a trailing underscore mean in `cluster_centers_`, `labels_` or `inertia_`?", "It’s a scikit-learn convention: the attribute was **learned from data** during `fit`."],
+  ["algo", "K-means with K = 4 on 2 features. How many numbers make up the whole model?", "**8**: 4 centroids × 2 coordinates. `predict` just measures distances to those 8 numbers."],
+  ["algo", "Why use NumPy instead of plain Python loops?", "NumPy hands the whole array to precompiled code (vectorization). In our test on 100,000 points the assignment step took 0.196 s with a loop and 0.025 s with NumPy: about **8 times faster**, same result."],
+  ["algo", "Almost every learning algorithm follows the same four-step shape. What is it?", "1. Start with some numbers (parameters), often random\n2. Measure how bad they are (a loss, like inertia)\n3. Change the numbers to improve the measure\n4. Repeat until improvement stops"],
+  ["algo", "Does the computer “understand” the data it clusters?", "No. It only adds, multiplies and compares numbers. Labels like “high-spending customers” are meanings we attach afterward."],
+
+  // ---- Seeds & random_state ----
+  ["seed", "Why can’t a normal computer produce truly random numbers?", "It follows exact instructions. Its “random” numbers come from a formula, a **pseudo-random number generator (PRNG)**, that only looks random."],
+  ["seed", "What is a seed?", "The number that starts the pseudo-random formula. Same seed → same sequence of “random” numbers, every time."],
+  ["seed", "Using xₙ₊₁ = (5xₙ + 3) mod 16 with seed 7, what are the first three numbers?", "(5×7+3) mod 16 = 38 mod 16 = **6**\n(5×6+3) mod 16 = 33 mod 16 = **1**\n(5×1+3) mod 16 = **8**"],
+  ["seed", "Using xₙ₊₁ = (5xₙ + 3) mod 16 with seed 2, what is the first number?", "**13**, since 5 × 2 + 3 = 13 and 13 mod 16 = 13."],
+  ["seed", "What three lessons does the tiny (5x + 3) mod 16 generator teach?", "1. The sequence **looks** random\n2. It is completely **determined** by the seed\n3. It eventually **repeats** (here after 16 numbers; the Mersenne Twister after 2¹⁹⁹³⁷ − 1)"],
+  ["seed", "What is `random_state` in scikit-learn?", "scikit-learn’s name for the seed. It controls every random choice an estimator makes, like starting centroids or how rows are shuffled."],
+  ["seed", "What are the three kinds of values `random_state` can take?", "- `None` (default): fresh randomness, results can change\n- An integer like `0` or `42`: the same result every run\n- A generator object: shares one generator across several steps"],
+  ["seed", "Why do people write `random_state=42`?", "It’s a joke from *The Hitchhiker’s Guide to the Galaxy* (“the answer to life, the universe and everything”). 42 has no special property; 0, 7 or 2026 work just as well."],
+  ["seed", "You run the same code with `random_state=7` twice. What happens?", "You get **identical** results both times."],
+  ["seed", "If I set `random_state`, is my result correct?", "It is **reproducible**, not correct. Fixing the seed hides randomness; it doesn’t remove it. Try several seeds to see whether the result is stable."],
+  ["seed", "`random_state=0` and `random_state=1` find the same clusters, but the labels look different: `[1 1 3 2…]` vs `[0 0 3 2…]`. Why?", "The groups are identical; only the cluster **numbers** are swapped. Cluster numbers are names, not meanings."],
+  ["seed", "Your model scores 91% with seed 42 and 78% on average with seeds 0–4. What should you report?", "The average and spread across seeds. 91% was luck. Choosing the luckiest seed is cheating yourself, and it won’t generalize."],
+  ["seed", "When should you fix the seed, and when should you vary it?", "**Fix it** for reproducibility: homework, teaching, reports, debugging, comparing models fairly.\n\n**Vary it** to test robustness: run seeds 0–4 and report the average and spread."],
+  ["seed", "Why does `train_test_split` need a `random_state`?", "Otherwise the split changes every run, so the accuracy changes too, and you can’t tell whether a model improved or just got a luckier split."],
+  ["seed", "With `init=\"random\"` and `n_init=1`, 3 of 6 seeds got stuck in a bad K-means result. What two lessons does that teach?", "The seed decides where the algorithm starts, and a single start can be unlucky. That is why the defaults use k-means++ and several restarts."],
+  ["seed", "Where does the randomness come from if you don’t set a seed?", "The library seeds itself from something unpredictable the operating system provides, such as timing noise. That’s why each unseeded run differs."],
+  ["seed", "Why do `np.random.default_rng(42)` and `np.random.seed(42)` give different numbers?", "They use different generators (PCG64 vs the Mersenne Twister). Same seed, different formula, different sequence."],
+  ["seed", "Will the same seed give the same result on another computer?", "Usually yes, with the same library versions. Different NumPy or scikit-learn versions, hardware or threads can occasionally change results slightly, so record your versions."],
+].map((c, i) => ({ id: c[0] + "-" + i, deck: c[0], q: c[1], a: c[2] }));
+
+const deckById = Object.fromEntries(DECKS.map(d => [d.id, d]));
+const KEY = "ml-flashcards-v1";
+
+let store = { known: {}, decks: null };
+try { const s = JSON.parse(localStorage.getItem(KEY) || "null"); if (s && typeof s === "object") store = Object.assign(store, s); } catch (e) {}
+function save() { try { localStorage.setItem(KEY, JSON.stringify(store)); } catch (e) {} }
+
+const state = {
+  decks: new Set(Array.isArray(store.decks) && store.decks.length ? store.decks.filter(d => deckById[d]) : DECKS.map(d => d.id)),
+  shuffle: false, missedOnly: false, view: "study",
+  order: [], pos: 0, flipped: false,
+};
+if (!state.decks.size) DECKS.forEach(d => state.decks.add(d.id));
+
+function esc(s) { return s.replace(/[&<>"]/g, ch => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[ch])); }
+function inline(s) {
+  return esc(s)
+    .replace(/`([^`]+)`/g, "<code>$1</code>")
+    .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
+    .replace(/\*([^*]+)\*/g, "<em>$1</em>");
+}
+function render(text) {
+  return text.split(/\n\n/).map(block => {
+    const lines = block.split("\n");
+    if (lines.every(l => l.startsWith("- "))) return "<ul>" + lines.map(l => "<li>" + inline(l.slice(2)) + "</li>").join("") + "</ul>";
+    if (lines.length === 1 && /^`[^`]+`$/.test(lines[0])) return '<span class="formula">' + esc(lines[0].slice(1, -1)) + "</span>";
+    return "<p>" + lines.map(inline).join("<br>") + "</p>";
+  }).join("");
+}
+
+function pool() {
+  return CARDS.filter(c => state.decks.has(c.deck) && (!state.missedOnly || store.known[c.id] === false));
+}
+function rebuild(keepCurrent) {
+  const cur = state.order[state.pos];
+  let ids = pool().map(c => c.id);
+  if (state.shuffle) {
+    for (let i = ids.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [ids[i], ids[j]] = [ids[j], ids[i]]; }
+  }
+  state.order = ids;
+  const idx = keepCurrent ? ids.indexOf(cur) : -1;
+  state.pos = idx >= 0 ? idx : 0;
+  state.flipped = false;
+  draw();
+}
+
+const $ = id => document.getElementById(id);
+
+function drawChips() {
+  const row = $("decks");
+  row.innerHTML = "";
+  const all = document.createElement("button");
+  all.className = "chip"; all.type = "button";
+  const allOn = state.decks.size === DECKS.length;
+  all.setAttribute("aria-pressed", String(allOn));
+  all.innerHTML = 'All decks <span class="n">' + CARDS.length + "</span>";
+  all.onclick = () => { DECKS.forEach(d => state.decks.add(d.id)); store.decks = [...state.decks]; save(); drawChips(); rebuild(false); };
+  row.appendChild(all);
+  [1, 2].forEach(sess => {
+    const lab = document.createElement("span");
+    lab.className = "rowlabel"; lab.textContent = "Session " + sess;
+    lab.style.marginLeft = "6px";
+    row.appendChild(lab);
+    DECKS.filter(d => d.session === sess).forEach(d => {
+      const b = document.createElement("button");
+      b.className = "chip"; b.type = "button";
+      b.style.setProperty("--c", "var(--c-" + d.id + ")");
+      const on = !allOn && state.decks.has(d.id);
+      b.setAttribute("aria-pressed", String(on));
+      const n = CARDS.filter(c => c.deck === d.id).length;
+      b.innerHTML = '<span class="dot"></span>' + esc(d.name) + ' <span class="n">' + n + "</span>";
+      b.onclick = () => {
+        if (allOn) { state.decks = new Set([d.id]); }
+        else if (state.decks.has(d.id)) { state.decks.delete(d.id); if (!state.decks.size) DECKS.forEach(x => state.decks.add(x.id)); }
+        else state.decks.add(d.id);
+        store.decks = [...state.decks]; save(); drawChips(); rebuild(false);
+      };
+      row.appendChild(b);
+    });
+  });
+}
+
+function drawProgress() {
+  const inDecks = CARDS.filter(c => state.decks.has(c.deck));
+  const k = inDecks.filter(c => store.known[c.id] === true).length;
+  const a = inDecks.filter(c => store.known[c.id] === false).length;
+  const n = inDecks.length;
+  $("pcount").textContent = state.view === "study" && state.order.length
+    ? "Card " + (state.pos + 1) + " of " + state.order.length
+    : state.order.length + " cards";
+  $("pstat").textContent = k + " known · " + a + " to review · " + (n - k - a) + " not seen";
+  $("bk").style.width = (n ? k / n * 100 : 0) + "%";
+  $("ba").style.width = (n ? a / n * 100 : 0) + "%";
+  $("missed").textContent = "Only “review again” (" + a + ")";
+}
+
+function drawStudy() {
+  const stage = $("stage");
+  if (!state.order.length) {
+    stage.innerHTML = '<div class="empty"><h2>Nothing to review here</h2><p>You have no cards marked “review again” in these decks.</p><button class="btn" id="showall">Show all cards</button></div>';
+    $("showall").onclick = () => { state.missedOnly = false; $("missed").setAttribute("aria-pressed", "false"); rebuild(false); };
+    return;
+  }
+  const card = CARDS.find(c => c.id === state.order[state.pos]);
+  const d = deckById[card.deck];
+  const mark = store.known[card.id];
+  const status = mark === true ? "Known" : mark === false ? "Review again" : "";
+  stage.innerHTML =
+    '<div class="card' + (state.flipped ? " flipped" : "") + '" id="card" tabindex="0" role="button" aria-label="Flashcard, ' + (state.flipped ? "answer side" : "question side") + '. Press to flip." style="--c: var(--c-' + d.id + ')">' +
+      '<div class="face front" aria-hidden="' + state.flipped + '">' +
+        '<div class="facehead"><span class="deck">' + esc(d.name) + '</span><span class="num">' + (status ? status + " · " : "") + "Q " + (state.pos + 1) + "/" + state.order.length + "</span></div>" +
+        '<div class="q">' + inline(card.q) + "</div>" +
+        '<div class="hint">Tap the card or press Space to see the answer</div>' +
+      "</div>" +
+      '<div class="face back" aria-hidden="' + !state.flipped + '">' +
+        '<div class="facehead"><span class="deck">' + esc(d.name) + '</span><span class="num">Answer</span></div>' +
+        '<div class="a">' + render(card.a) + "</div>" +
+        '<div class="hint">' + inline(card.q) + "</div>" +
+      "</div>" +
+    "</div>" +
+    '<div class="controls" style="margin-top:16px">' +
+      '<button class="btn prev" id="prev" aria-label="Previous card"' + (state.pos === 0 ? " disabled" : "") + ">←</button>" +
+      '<button class="btn again" id="again">Review again</button>' +
+      '<button class="btn good" id="good">I knew it</button>' +
+      '<button class="btn next" id="next" aria-label="Next card"' + (state.pos >= state.order.length - 1 ? " disabled" : "") + ">→</button>" +
+    "</div>" +
+    '<p class="keys"><kbd>Space</kbd> flip · <kbd>←</kbd> <kbd>→</kbd> move · <kbd>1</kbd> review again · <kbd>2</kbd> I knew it</p>';
+  const el = $("card");
+  el.onclick = flip;
+  $("prev").onclick = () => go(-1);
+  $("next").onclick = () => go(1);
+  $("again").onclick = () => markCard(false);
+  $("good").onclick = () => markCard(true);
+}
+
+function drawList() {
+  const list = $("list");
+  if (!state.order.length) { list.innerHTML = '<div class="empty"><h2>Nothing to show</h2><p>No cards match these filters.</p></div>'; return; }
+  list.innerHTML = state.order.map(id => {
+    const c = CARDS.find(x => x.id === id), d = deckById[c.deck], m = store.known[c.id];
+    const st = m === true ? '<b class="k">Known</b>' : m === false ? '<b class="x">Review again</b>' : "Not seen yet";
+    return '<article class="item" style="--c: var(--c-' + d.id + ')"><div class="iq">' + inline(c.q) + '</div><div class="ia">' + render(c.a) + '</div><div class="state"><span>' + esc(d.name) + "</span><span>·</span>" + st + "</div></article>";
+  }).join("");
+}
+
+function draw() {
+  $("study").hidden = state.view !== "study";
+  $("listview").hidden = state.view !== "list";
+  if (state.view === "study") drawStudy(); else drawList();
+  drawProgress();
+}
+
+function flip() {
+  state.flipped = !state.flipped;
+  const el = $("card");
+  if (!el) return;
+  el.classList.toggle("flipped", state.flipped);
+  el.querySelector(".front").setAttribute("aria-hidden", String(state.flipped));
+  el.querySelector(".back").setAttribute("aria-hidden", String(!state.flipped));
+}
+function go(step) {
+  const np = state.pos + step;
+  if (np < 0 || np >= state.order.length) return;
+  state.pos = np; state.flipped = false; draw();
+  const el = $("card"); if (el) el.focus({ preventScroll: true });
+}
+function markCard(known) {
+  const id = state.order[state.pos];
+  if (!id) return;
+  store.known[id] = known; save();
+  if (state.missedOnly && known) {
+    state.order.splice(state.pos, 1);
+    if (state.pos >= state.order.length) state.pos = Math.max(0, state.order.length - 1);
+    state.flipped = false; draw();
+  } else if (state.pos < state.order.length - 1) { go(1); }
+  else { draw(); }
+}
+
+$("v-study").onclick = () => { state.view = "study"; $("v-study").setAttribute("aria-pressed", "true"); $("v-list").setAttribute("aria-pressed", "false"); draw(); };
+$("v-list").onclick = () => { state.view = "list"; $("v-list").setAttribute("aria-pressed", "true"); $("v-study").setAttribute("aria-pressed", "false"); draw(); };
+$("shuffle").onclick = () => { state.shuffle = !state.shuffle; $("shuffle").setAttribute("aria-pressed", String(state.shuffle)); rebuild(false); };
+$("missed").onclick = () => { state.missedOnly = !state.missedOnly; $("missed").setAttribute("aria-pressed", String(state.missedOnly)); rebuild(false); };
+$("reset").onclick = function () {
+  if (this.dataset.armed) { store.known = {}; save(); delete this.dataset.armed; this.textContent = "Reset my progress"; rebuild(false); return; }
+  this.dataset.armed = "1"; this.textContent = "Click again to clear all marks";
+  setTimeout(() => { if (this.dataset.armed) { delete this.dataset.armed; this.textContent = "Reset my progress"; } }, 4000);
+};
+
+document.addEventListener("keydown", e => {
+  if (state.view !== "study" || e.metaKey || e.ctrlKey || e.altKey) return;
+  const t = e.target;
+  if (t && t.tagName === "BUTTON" && t.id !== "card" && (e.key === " " || e.key === "Enter")) return;
+  if (e.key === " " || e.key === "Enter") { e.preventDefault(); flip(); }
+  else if (e.key === "ArrowRight") { e.preventDefault(); go(1); }
+  else if (e.key === "ArrowLeft") { e.preventDefault(); go(-1); }
+  else if (e.key === "1") markCard(false);
+  else if (e.key === "2") markCard(true);
+});
+
+drawChips();
+rebuild(false);
+</script>
+</body>
+</html>
