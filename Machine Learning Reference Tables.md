@@ -1,7 +1,5 @@
 # Machine Learning Reference Tables
 
-Oct 25, 2026 · @Sama
-
 The key comparison tables from our machine learning lessons, collected in one place. New tables are added after each session.
 
 ## Session 1: Machine learning, unsupervised learning and K-means
