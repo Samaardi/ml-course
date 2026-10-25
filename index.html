@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="description" content="Flashcards for the machine learning course: intro to ML, unsupervised learning, K-means, algorithms, seeds and random_state.">
+<meta name="description" content="Flashcards for the machine learning course: intro to ML, unsupervised learning, K-means, algorithms, seeds, scaling and cluster evaluation.">
 <title>K-means &amp; Seeds Flashcards</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='3' y='6' width='26' height='20' rx='4' fill='%232F5D8A'/%3E%3Ccircle cx='11' cy='16' r='3' fill='%23fff'/%3E%3Ccircle cx='21' cy='13' r='2.2' fill='%23fff'/%3E%3Ccircle cx='20' cy='20' r='2.2' fill='%23fff'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -26,6 +26,8 @@
   --c-kmeans: #B4492A;
   --c-algo: #6E4FA3;
   --c-seed: #946C0E;
+  --c-scale: #1F7A80;
+  --c-eval: #A3456E;
   --shadow: 0 1px 2px rgba(22,32,43,.06), 0 8px 24px rgba(22,32,43,.08);
   --f-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
   --f-body: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
@@ -35,7 +37,7 @@
   :root:not([data-theme="light"]) {
     --bg: #0F151C; --surface: #18212B; --surface-2: #212C38; --ink: #E6ECF2; --muted: #9AA8B6; --line: #2B3745;
     --accent: #7FAEDD; --good: #6CC193; --again: #F08A68;
-    --c-ml: #7FAEDD; --c-uml: #6CC193; --c-kmeans: #F08A68; --c-algo: #B79BE6; --c-seed: #E2B94D;
+    --c-ml: #7FAEDD; --c-uml: #6CC193; --c-kmeans: #F08A68; --c-algo: #B79BE6; --c-seed: #E2B94D; --c-scale: #5CC4CB; --c-eval: #E58AB0;
     --shadow: 0 1px 2px rgba(0,0,0,.3), 0 10px 28px rgba(0,0,0,.35);
     color-scheme: dark;
   }
@@ -43,7 +45,7 @@
 :root[data-theme="dark"] {
   --bg: #0F151C; --surface: #18212B; --surface-2: #212C38; --ink: #E6ECF2; --muted: #9AA8B6; --line: #2B3745;
   --accent: #7FAEDD; --good: #6CC193; --again: #F08A68;
-  --c-ml: #7FAEDD; --c-uml: #6CC193; --c-kmeans: #F08A68; --c-algo: #B79BE6; --c-seed: #E2B94D;
+  --c-ml: #7FAEDD; --c-uml: #6CC193; --c-kmeans: #F08A68; --c-algo: #B79BE6; --c-seed: #E2B94D; --c-scale: #5CC4CB; --c-eval: #E58AB0;
   --shadow: 0 1px 2px rgba(0,0,0,.3), 0 10px 28px rgba(0,0,0,.35);
   color-scheme: dark;
 }
@@ -173,9 +175,9 @@ footer button { font: inherit; color: var(--muted); background: none; border: 0;
 <body>
 <div class="wrap">
   <header>
-    <div class="eyebrow">Machine learning · Sessions 1 &amp; 2</div>
+    <div class="eyebrow">Machine learning · Sessions 1–3</div>
     <h1>K-means &amp; Seeds Flashcards</h1>
-    <p class="lede">Review the ideas from our first two lessons. Read the question, answer it in your head, then flip the card and be honest about whether you knew it.</p>
+    <p class="lede">Review the ideas from our lessons and prepare for the scikit-learn certification exam. Read the question, answer it in your head, then flip the card and be honest about whether you knew it.</p>
   </header>
 
   <section class="filters" aria-label="Choose cards">
@@ -216,20 +218,20 @@ const DECKS = [
   { id: "kmeans", name: "K-means",               session: 1 },
   { id: "algo",   name: "Algorithms",            session: 2 },
   { id: "seed",   name: "Seeds & random_state",  session: 2 },
+  { id: "scale",  name: "Scaling & transformers", session: 3 },
+  { id: "eval",   name: "Cluster evaluation & API", session: 3 },
 ];
 
 // q = question, a = answer. Inline markup: `code`, **bold**, blank line = new paragraph, "- " lines = list.
+function hash(t) { let h = 5381; for (let i = 0; i < t.length; i++) h = ((h << 5) + h + t.charCodeAt(i)) >>> 0; return h.toString(36); }
 const CARDS = [
-  // ---- What is ML? ----
+  // ---- ML basics ----
   ["ml", "What is machine learning?", "A way to make computers learn the rules from examples instead of being given them.\n\nTraditional programming: rules + data → answers.\nMachine learning: data + answers → rules."],
-  ["ml", "Tom Mitchell’s definition of learning uses three letters: T, E and P. What do they stand for?", "A program learns if its performance **P** on a task **T** improves with experience **E**.\n\n- T: what the program must do\n- E: the data it learns from\n- P: how we measure success"],
-  ["ml", "Name T, E and P for a spam filter.", "- T: label each email as spam or not spam\n- E: emails that users already flagged\n- P: % of new emails labelled correctly"],
   ["ml", "When should you **not** use machine learning?", "When a formula already works (tax calculation), when there is no data to learn from, or when every decision must follow a written rule."],
   ["ml", "What are the three learning paradigms?", "- **Supervised**: data comes with answers (labels)\n- **Unsupervised**: no answers; find structure\n- **Reinforcement**: learn by trial and reward"],
   ["ml", "Classification vs regression: what is the difference?", "Both are supervised.\n\n**Classification** predicts a category (spam / not spam). **Regression** predicts a number (a house price)."],
-  ["ml", "What is self-supervised learning?", "Learning where the labels are made from the data itself. Large language models predict the next word, so the text supplies its own answers."],
-  ["ml", "Which paradigm and task? Predict tomorrow’s temperature from past weather.", "Supervised learning, regression (the answer is a number)."],
   ["ml", "Which paradigm and task? Find unusual bank transactions with no fraud labels.", "Unsupervised learning, anomaly detection."],
+  ["ml", "What is self-supervised learning?", "Learning where the labels are made from the data itself. Large language models predict the next word, so the text supplies its own answers."],
   ["ml", "Feature vs label?", "A **feature** is one measurable property, a column of the data.\n\nA **label** is the answer column in supervised learning."],
   ["ml", "Parameter vs hyperparameter? Give the K-means example.", "A **parameter** is learned by the algorithm: the centroid positions.\n\nA **hyperparameter** is chosen by you before training: K."],
   ["ml", "What is generalization?", "Doing well on data the model has never seen. It is the real goal of ML."],
@@ -248,64 +250,100 @@ const CARDS = [
 
   // ---- K-means ----
   ["kmeans", "Explain K-means with the pizza-shop analogy.", "Open K pizza shops anywhere in the city. Each house picks its nearest shop. Each shop moves to the centre of its customers. Repeat until no shop moves."],
-  ["kmeans", "Which two steps does K-means repeat?", "1. **Assign**: each point joins its nearest centroid.\n\n2. **Update**: each centroid moves to the mean of its points."],
   ["kmeans", "What is a centroid?", "The centre of a cluster: the mean (average) of all points in it."],
-  ["kmeans", "What does K-means minimize?", "Inertia, also called the within-cluster sum of squares (WCSS):\n\n`J = Σₖ Σ ‖x − μₖ‖²`\n\nThe total squared distance from every point to its own cluster’s centroid."],
-  ["kmeans", "How do you compute the Euclidean distance between (1, 1) and (4, 5)?", "Square root of the sum of squared differences per feature:\n\n√((4−1)² + (5−1)²) = √(9 + 16) = √25 = **5**"],
+  ["kmeans", "Which two steps does K-means repeat?", "1. **Assign**: each point joins its nearest centroid.\n\n2. **Update**: each centroid moves to the mean of its points."],
   ["kmeans", "When does K-means stop?", "When no point changes cluster, when the centroids move less than a small tolerance, or when `max_iter` is reached (300 by default)."],
   ["kmeans", "Why is K-means guaranteed to stop?", "Each step can only lower J or keep it the same, and there are only finitely many ways to split the points. So no split can repeat, and the loop must end."],
   ["kmeans", "Does K-means always find the best clustering?", "No. It stops at a **local minimum**. Finding the global best is NP-hard, so the starting centroids matter."],
-  ["kmeans", "Worked example: P1 = (1, 1) and P3 = (1, 2) are the only points in cluster 1. Where does c1 move?", "To their mean: ((1+1)/2, (1+2)/2) = **(1, 1.5)**."],
-  ["kmeans", "Worked example (8 points, K = 2, bad start). What were the final centroids and inertia?", "c1 = (1.5, 1.75), c2 = (6.75, 5.75).\n\nInertia fell from 191 to **9.25** (3.75 + 5.50) in three iterations."],
+  ["kmeans", "Two runs of K-means give different clusters. Why, and what do you do?", "Different random starts reach different local minima. Use k-means++ with several restarts (`n_init`), and set `random_state` if you need the same result every time."],
   ["kmeans", "What does k-means++ do?", "It spreads the starting centroids apart: each next centroid is picked with probability proportional to its squared distance from the nearest centroid already chosen. It is scikit-learn’s default."],
   ["kmeans", "What does `n_init` do?", "Runs K-means several times from different starts and keeps the run with the lowest inertia. It protects against one unlucky start."],
   ["kmeans", "Why can’t inertia alone tell you the best K?", "Inertia always falls as K grows. With K = number of points, it reaches 0, which is useless."],
   ["kmeans", "How does the elbow method choose K?", "Plot inertia against K. Inertia drops sharply, then flattens. The K at the bend (the elbow) is a good choice."],
-  ["kmeans", "What is the silhouette score?", "`s = (b − a) / max(a, b)`\n\n- a: mean distance to points in its own cluster\n- b: mean distance to the nearest other cluster\n\nIt ranges from −1 to 1; higher is better. In our demo it peaked at 0.83 for K = 4."],
   ["kmeans", "Features are age (years) and income (euros). What must you do before K-means, and why?", "**Standardize** the features (e.g. `StandardScaler`).\n\nIncome is about 1,000 times larger, so it dominates every distance. In our demo the adjusted Rand index was 0.0 on raw features and 1.0 after scaling."],
   ["kmeans", "Why does K-means fail on the “two moons” dataset? What could you use instead?", "K-means draws straight boundaries and assumes round clusters, so it cuts each moon in half. DBSCAN or spectral clustering can follow the curved shape."],
   ["kmeans", "Name three other weaknesses of K-means and an alternative for each.", "- **Outliers** pull the mean → K-medoids\n- **Categorical data** has no mean → K-modes\n- **Many dimensions** make distances similar → PCA, then cluster\n- **Unknown K** → hierarchical clustering, DBSCAN"],
-  ["kmeans", "Two runs of K-means give different clusters. Why, and what do you do?", "Different random starts reach different local minima. Use k-means++ with several restarts (`n_init`), and set `random_state` if you need the same result every time."],
 
   // ---- Algorithms ----
   ["algo", "What is an algorithm?", "A finite list of precise steps that turns an input into an output. Like a recipe that anyone, or any machine, can follow and get the same result."],
+  ["algo", "Looking up a word in a paper dictionary (open in the middle, go left or right, repeat) is which algorithm?", "**Binary search.**"],
   ["algo", "Name the five properties of an algorithm.", "- **Input**: zero or more inputs\n- **Output**: at least one result\n- **Definiteness**: every step is exact\n- **Finiteness**: it stops after a finite number of steps\n- **Effectiveness**: every step can actually be carried out"],
   ["algo", "In the tea algorithm, which property does “Boil 250 ml of water” fix that “Boil some water” breaks?", "**Definiteness**: every step must be exact and leave nothing to guess."],
   ["algo", "Which of these is **not** a property of an algorithm: finiteness, definiteness, randomness, output?", "**Randomness.** Algorithms may use randomness, but it isn’t a defining property."],
   ["algo", "Algorithm vs program vs model?", "- **Algorithm**: the idea, the steps (“assign, update, repeat”)\n- **Program**: the algorithm written in a language (scikit-learn’s `KMeans`)\n- **Model**: the numbers you get after running a learning algorithm on data (the centroids)\n\nRecipe → recipe written in Persian → the cake you baked."],
-  ["algo", "Looking up a word in a paper dictionary (open in the middle, go left or right, repeat) is which algorithm?", "**Binary search.**"],
   ["algo", "Why are there many algorithms for the same problem?", "They differ in speed, memory and quality, and each assumes different things about the data. Choosing an algorithm means choosing a set of assumptions."],
+  ["algo", "Almost every learning algorithm follows the same four-step shape. What is it?", "1. Start with some numbers (parameters), often random\n2. Measure how bad they are (a loss, like inertia)\n3. Change the numbers to improve the measure\n4. Repeat until improvement stops"],
   ["algo", "After `km = KMeans(4)` and before `km.fit(X)`, does `km` contain learned centroids?", "No. Creating the object only stores your settings. `fit` does the learning."],
   ["algo", "What happens, in order, inside `KMeans(...).fit(X)`?", "1. Check the input (2-D numbers, no missing values)\n2. Turn `random_state` into a random number generator\n3. Pick starting centroids with k-means++\n4. Loop: assign, update, until converged\n5. Repeat 3–4 `n_init` times, keep the lowest inertia\n6. Store the results"],
   ["algo", "What does a trailing underscore mean in `cluster_centers_`, `labels_` or `inertia_`?", "It’s a scikit-learn convention: the attribute was **learned from data** during `fit`."],
   ["algo", "K-means with K = 4 on 2 features. How many numbers make up the whole model?", "**8**: 4 centroids × 2 coordinates. `predict` just measures distances to those 8 numbers."],
-  ["algo", "Why use NumPy instead of plain Python loops?", "NumPy hands the whole array to precompiled code (vectorization). In our test on 100,000 points the assignment step took 0.196 s with a loop and 0.025 s with NumPy: about **8 times faster**, same result."],
-  ["algo", "Almost every learning algorithm follows the same four-step shape. What is it?", "1. Start with some numbers (parameters), often random\n2. Measure how bad they are (a loss, like inertia)\n3. Change the numbers to improve the measure\n4. Repeat until improvement stops"],
   ["algo", "Does the computer “understand” the data it clusters?", "No. It only adds, multiplies and compares numbers. Labels like “high-spending customers” are meanings we attach afterward."],
 
   // ---- Seeds & random_state ----
   ["seed", "Why can’t a normal computer produce truly random numbers?", "It follows exact instructions. Its “random” numbers come from a formula, a **pseudo-random number generator (PRNG)**, that only looks random."],
   ["seed", "What is a seed?", "The number that starts the pseudo-random formula. Same seed → same sequence of “random” numbers, every time."],
-  ["seed", "Using xₙ₊₁ = (5xₙ + 3) mod 16 with seed 7, what are the first three numbers?", "(5×7+3) mod 16 = 38 mod 16 = **6**\n(5×6+3) mod 16 = 33 mod 16 = **1**\n(5×1+3) mod 16 = **8**"],
-  ["seed", "Using xₙ₊₁ = (5xₙ + 3) mod 16 with seed 2, what is the first number?", "**13**, since 5 × 2 + 3 = 13 and 13 mod 16 = 13."],
-  ["seed", "What three lessons does the tiny (5x + 3) mod 16 generator teach?", "1. The sequence **looks** random\n2. It is completely **determined** by the seed\n3. It eventually **repeats** (here after 16 numbers; the Mersenne Twister after 2¹⁹⁹³⁷ − 1)"],
   ["seed", "What is `random_state` in scikit-learn?", "scikit-learn’s name for the seed. It controls every random choice an estimator makes, like starting centroids or how rows are shuffled."],
   ["seed", "What are the three kinds of values `random_state` can take?", "- `None` (default): fresh randomness, results can change\n- An integer like `0` or `42`: the same result every run\n- A generator object: shares one generator across several steps"],
   ["seed", "Why do people write `random_state=42`?", "It’s a joke from *The Hitchhiker’s Guide to the Galaxy* (“the answer to life, the universe and everything”). 42 has no special property; 0, 7 or 2026 work just as well."],
   ["seed", "You run the same code with `random_state=7` twice. What happens?", "You get **identical** results both times."],
-  ["seed", "If I set `random_state`, is my result correct?", "It is **reproducible**, not correct. Fixing the seed hides randomness; it doesn’t remove it. Try several seeds to see whether the result is stable."],
-  ["seed", "`random_state=0` and `random_state=1` find the same clusters, but the labels look different: `[1 1 3 2…]` vs `[0 0 3 2…]`. Why?", "The groups are identical; only the cluster **numbers** are swapped. Cluster numbers are names, not meanings."],
-  ["seed", "Your model scores 91% with seed 42 and 78% on average with seeds 0–4. What should you report?", "The average and spread across seeds. 91% was luck. Choosing the luckiest seed is cheating yourself, and it won’t generalize."],
-  ["seed", "When should you fix the seed, and when should you vary it?", "**Fix it** for reproducibility: homework, teaching, reports, debugging, comparing models fairly.\n\n**Vary it** to test robustness: run seeds 0–4 and report the average and spread."],
-  ["seed", "Why does `train_test_split` need a `random_state`?", "Otherwise the split changes every run, so the accuracy changes too, and you can’t tell whether a model improved or just got a luckier split."],
-  ["seed", "With `init=\"random\"` and `n_init=1`, 3 of 6 seeds got stuck in a bad K-means result. What two lessons does that teach?", "The seed decides where the algorithm starts, and a single start can be unlucky. That is why the defaults use k-means++ and several restarts."],
-  ["seed", "Where does the randomness come from if you don’t set a seed?", "The library seeds itself from something unpredictable the operating system provides, such as timing noise. That’s why each unseeded run differs."],
-  ["seed", "Why do `np.random.default_rng(42)` and `np.random.seed(42)` give different numbers?", "They use different generators (PCG64 vs the Mersenne Twister). Same seed, different formula, different sequence."],
   ["seed", "Will the same seed give the same result on another computer?", "Usually yes, with the same library versions. Different NumPy or scikit-learn versions, hardware or threads can occasionally change results slightly, so record your versions."],
-].map((c, i) => ({ id: c[0] + "-" + i, deck: c[0], q: c[1], a: c[2] }));
+  ["seed", "With `init=\"random\"` and `n_init=1`, 3 of 6 seeds got stuck in a bad K-means result. What two lessons does that teach?", "The seed decides where the algorithm starts, and a single start can be unlucky. That is why the defaults use k-means++ and several restarts."],
+  ["seed", "`random_state=0` and `random_state=1` find the same clusters, but the labels look different: `[1 1 3 2…]` vs `[0 0 3 2…]`. Why?", "The groups are identical; only the cluster **numbers** are swapped. Cluster numbers are names, not meanings."],
+  ["seed", "Why does `train_test_split` need a `random_state`?", "Otherwise the split changes every run, so the accuracy changes too, and you can’t tell whether a model improved or just got a luckier split."],
+  ["seed", "If I set `random_state`, is my result correct?", "It is **reproducible**, not correct. Fixing the seed hides randomness; it doesn’t remove it. Try several seeds to see whether the result is stable."],
+  ["seed", "When should you fix the seed, and when should you vary it?", "**Fix it** for reproducibility: homework, teaching, reports, debugging, comparing models fairly.\n\n**Vary it** to test robustness: run seeds 0–4 and report the average and spread."],
+  ["seed", "Your model scores 91% with seed 42 and 78% on average with seeds 0–4. What should you report?", "The average and spread across seeds. 91% was luck. Choosing the luckiest seed is cheating yourself, and it won’t generalize."],
+
+  // ---- Session 3: Scaling & transformers (exam focus) ----
+  ["scale", "Why does K-means need feature scaling?", "K-means compares points by **distance**, so the feature with the largest numbers dominates.\n\nOn the raw wine data, proline (values up to 1,680) holds 99.8% of the variance, so unscaled K-means clusters by proline alone."],
+  ["scale", "What does scaling change, and what stays the same?", "It **changes** the distances between points, and so the clusters.\n\nIt **keeps** the number of rows and the order of values within each column."],
+  ["scale", "Preview: does a decision tree need feature scaling?", "No. Trees split on one feature at a time, so only the order of values matters. Distance-based methods like K-means do need scaling."],
+  ["scale", "What does StandardScaler produce?", "Each feature gets **mean 0** and **standard deviation 1**.\n\nThe output is **not** bounded: values like −2.3 or 4.1 are normal."],
+  ["scale", "True or false: after StandardScaler, every feature follows a normal distribution.", "**False.** It only shifts and rescales. A skewed feature stays exactly as skewed."],
+  ["scale", "What range does MinMaxScaler produce, and what happens to a new value larger than the fitted maximum?", "[0, 1] by default (change it with `feature_range`).\n\nA new value above the fitted max becomes **greater than 1**, unless you set `clip=True`."],
+  ["scale", "Which scalers are sensitive to outliers, and which one is not?", "**MinMaxScaler** and **StandardScaler** are sensitive (they use min/max and mean/std).\n\n**RobustScaler** is robust: it uses the **median** and the **interquartile range (IQR)**."],
+  ["scale", "A feature has values 10, 12, 11, 13, 500. Which scaler keeps the spacing of the first four values sensible?", "**RobustScaler**, because the median and IQR ignore the extreme value 500."],
+  ["scale", "True or false: RobustScaler removes outliers.", "**False.** The outlier is still there (in class, the CEO’s salary became 16). It just doesn’t distort how the other values are scaled."],
+  ["scale", "Scalers vs transformers (QuantileTransformer, PowerTransformer): what is the key difference?", "Scalers only **shift and stretch**; the shape of the distribution stays the same.\n\nTransformers **reshape** the distribution, for example making a skewed feature bell-shaped."],
+  ["scale", "Which two output distributions can QuantileTransformer produce?", "`uniform` (the default, values between 0 and 1) or `normal` (set `output_distribution=\"normal\"`)."],
+  ["scale", "PowerTransformer: Box-Cox vs Yeo-Johnson?", "**Box-Cox** works only on strictly positive data (it raises an error otherwise).\n\n**Yeo-Johnson** works on any values and is the **default**."],
+  ["scale", "Does PowerTransformer standardize its output?", "Yes. `standardize=True` is the default, so the result has mean 0 and std 1. No extra StandardScaler is needed."],
+  ["scale", "Which scaler fits each case? Bounded scores (0–100), a right-skewed income, outliers you want to keep, everything else.", "- Bounded scores → **MinMaxScaler**\n- Right-skewed income → **PowerTransformer**\n- Outliers you want to keep → **RobustScaler**\n- Everything else → **StandardScaler**"],
+  ["scale", "On new or held-back data, do you call `fit_transform` or `transform`?", "`transform`. Never refit the scaler on new data; reuse the statistics learned in `fit`."],
+  ["scale", "What does `scaler.transform(X_new)` use?", "The statistics learned during `fit` (for StandardScaler, `mean_` and `scale_`), not X_new’s own mean and standard deviation."],
+  ["scale", "A data scientist runs `StandardScaler().fit_transform(X)` and then `train_test_split`. What is wrong?", "**Data leakage.** The scaler has already seen the test rows.\n\nSplit first, fit the scaler on the training part only, then `transform` the test part."],
+  ["scale", "How do you report K-means centroids in real units after scaling?", "`scaler.inverse_transform(km.cluster_centers_)`"],
+  ["scale", "What does `ColumnTransformer` let you do?", "Apply a different transformer to different columns (e.g. RobustScaler on income, MinMaxScaler on a score) and glue the results into one array."],
+  ["scale", "A ColumnTransformer lists only `age` and `income`, but the table also has `score`. What happens to `score`?", "It is **dropped** (the default is `remainder=\"drop\"`). Use `remainder=\"passthrough\"` to keep it unchanged."],
+  ["scale", "Why put the scaler and K-means in a `Pipeline`?", "The steps always run in the right order, with the right method: `fit` does `fit_transform` on the scaler, then `fit` on K-means; `predict` does `transform`, then `predict`. That prevents leakage and forgotten steps."],
+  ["scale", "In `make_pipeline(StandardScaler(), KMeans())`, how do you set the number of clusters to 4?", "`pipe.set_params(kmeans__n_clusters=4)`\n\nStep name (lower-case class name with `make_pipeline`), then **two underscores**, then the parameter."],
+
+  // ---- Session 3: Cluster evaluation & the estimator API (exam focus) ----
+  ["eval", "Inertia for K = 2, 3, 4 is 1659, 1278 and 1181. A colleague picks K = 4 because it is lowest. What is wrong?", "Inertia **always decreases** as K grows (it reaches 0 when every point is its own cluster). Use the elbow method and the silhouette score instead."],
+  ["eval", "How does the elbow method choose K?", "Plot inertia for K = 1, 2, … and pick the K where the drops change from large to small (the bend). It is a visual judgement and can be ambiguous."],
+  ["eval", "What range does the silhouette score have, and what do its values mean?", "−1 to 1.\n\n- Near 1: well inside its own cluster\n- Around 0: on the border between clusters\n- Negative: closer to another cluster, probably misplaced"],
+  ["eval", "`silhouette_score(X, labels)` returns −0.05. What does it suggest?", "Many points are closer to another cluster than to their own: the clustering is poor."],
+  ["eval", "Why can’t you compute the silhouette score for K = 1?", "Each point needs a nearest **other** cluster. scikit-learn requires between 2 and n − 1 clusters and raises an error otherwise."],
+  ["eval", "Where does `silhouette_score` live, and what does it take?", "It is a function in `sklearn.metrics`, not a KMeans method. It takes the **data** and the **labels**: `silhouette_score(X_scaled, labels)`."],
+  ["eval", "`silhouette_score` vs `silhouette_samples`?", "`silhouette_score` returns one number, the mean for the whole clustering.\n\n`silhouette_samples` returns one value per point, which you need for a silhouette plot."],
+  ["eval", "Internal vs external clustering scores?", "**Internal** (inertia, silhouette, Davies–Bouldin, Calinski–Harabasz) use only X and the labels.\n\n**External** (adjusted Rand index) compare with true labels, so they’re only possible when the true groups are known."],
+  ["eval", "Silhouette 0.57 on raw data vs 0.29 on standardized data. Which clustering is better?", "You **can’t compare** them: they are computed on different data. On the wine data the raw version actually matched the real groups far worse (ARI 0.37 vs 0.90)."],
+  ["eval", "What is a radar chart used for in clustering?", "To **profile** clusters: one axis per feature, one shape per cluster, so you can see and name what makes each cluster different."],
+  ["eval", "Should a radar chart show raw or scaled cluster means?", "**Scaled.** In raw units the biggest feature fills the chart. Put a table in real units next to it for stakeholders."],
+  ["eval", "Name two pitfalls of radar charts.", "- More than about 8 axes or 4–5 clusters becomes unreadable\n- The **area** has no meaning: it depends on the order of the axes, so compare axis by axis"],
+  ["eval", "What does `StandardScaler().fit(X)` return?", "The fitted **StandardScaler object** itself, not the scaled data. That is why calls can be chained: `.fit(X).transform(X)`."],
+  ["eval", "Which methods does KMeans have?", "All five: `fit`, `transform`, `fit_transform`, `predict`, `fit_predict`."],
+  ["eval", "`km.fit_predict(X)` gives the same result as which of these: `km.fit(X).labels_`, `km.transform(X)`, `km.score(X)`, `km.cluster_centers_`?", "`km.fit(X).labels_`"],
+  ["eval", "Can you call `km.predict(X_new)` after `km.fit_predict(X)`?", "Yes. `fit_predict` also fits the model, so new points can then be assigned to the nearest centroid."],
+  ["eval", "What does `KMeans.transform(X)` return?", "The **distance from each point to each centroid**, shape (n_samples, n_clusters). It does not return labels."],
+  ["eval", "X is 300 × 2. What is the shape of `KMeans(n_clusters=4).fit_transform(X)`?", "**(300, 4)**: one distance per point per centroid."],
+  ["eval", "Which call fails: `KMeans(3).fit(X).predict(X_new)`, `StandardScaler().fit(X).predict(X_new)`, `StandardScaler().fit(X).transform(X_new)`?", "`StandardScaler().fit(X).predict(X_new)`: a scaler has **no** `predict`."],
+  ["eval", "Which methods does a Pipeline offer?", "Those of its **last** step. `make_pipeline(StandardScaler(), KMeans(3))` has `fit_predict` and `predict` because KMeans does."],
+  ["eval", "Preview for the exam: which clustering algorithms have `fit_predict` but no `predict`?", "DBSCAN and AgglomerativeClustering. They label the data they were fitted on but can’t assign new points."],
+].map(c => ({ id: c[0] + "-" + hash(c[1]), deck: c[0], q: c[1], a: c[2] }));
 
 const deckById = Object.fromEntries(DECKS.map(d => [d.id, d]));
-const KEY = "ml-flashcards-v1";
+const KEY = "ml-flashcards-v2";
 
 let store = { known: {}, decks: null };
 try { const s = JSON.parse(localStorage.getItem(KEY) || "null"); if (s && typeof s === "object") store = Object.assign(store, s); } catch (e) {}
@@ -362,7 +400,7 @@ function drawChips() {
   all.innerHTML = 'All decks <span class="n">' + CARDS.length + "</span>";
   all.onclick = () => { DECKS.forEach(d => state.decks.add(d.id)); store.decks = [...state.decks]; save(); drawChips(); rebuild(false); };
   row.appendChild(all);
-  [1, 2].forEach(sess => {
+  [1, 2, 3].forEach(sess => {
     const lab = document.createElement("span");
     lab.className = "rowlabel"; lab.textContent = "Session " + sess;
     lab.style.marginLeft = "6px";
