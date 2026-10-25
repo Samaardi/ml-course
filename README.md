@@ -2,9 +2,7 @@
 
 Flashcards for a machine learning course covering unsupervised learning (UML) and supervised learning (SML). The cards also prepare students for the **scikit-learn Associate Practitioner** certification by Probabl.
 
-**Open the flashcards:** `https://Samaardi.github.io/<repository-name>/`
-
-No account or installation is needed. The site works on phones, tablets and computers.
+### [👉 Open the flashcards](https://samaardi.github.io/ml-flashcards/)
 
 ---
 
