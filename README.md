@@ -1,9 +1,12 @@
-# Machine Learning Flashcards
+# Machine Learning Course
 
-Flashcards for a machine learning course covering unsupervised learning (UML) and supervised learning (SML). The cards also prepare students for the **scikit-learn Associate Practitioner** certification by Probabl.
+Study materials for a machine learning course covering unsupervised learning (UML) and supervised learning (SML): interactive flashcards and reference tables from each lesson. The materials also prepare students for the **scikit-learn Associate Practitioner** certification by Probabl.
 
 ### [👉 Open the flashcards](https://samaardi.github.io/ml-flashcards/)
 
+### [📊 Machine Learning Reference Tables](Machine%20Learning%20Reference%20Tables.md)
+ 
+The key comparison tables from each lesson, collected in one place.
 ---
 
 ## How to use the flashcards
@@ -40,4 +43,5 @@ The decks focus on points that appear in the **scikit-learn Associate Practition
 | File | Purpose |
 | --- | --- |
 | `index.html` | The whole flashcard website: page, styles, cards and logic in one file |
+| `Machine Learning Reference Tables.md` | The key comparison tables from the lessons |
 | `README.md` | This file |
