@@ -10,11 +10,11 @@ The key comparison tables from each lesson, collected in one place.
  
 ## What's inside
  
-102 flashcards so far, grouped by session. New decks are added as the course progresses.
+209 flashcards in 13 decks, grouped by topic: foundations, preprocessing, clustering (K-means, DBSCAN, HDBSCAN, hierarchical clustering and how to choose between them) and dimensionality reduction (PCA, t-SNE). Every card was checked against scikit-learn 1.9. New decks are added as the course progresses.
  
 ## How to study
  
-1. Pick a deck, or study all cards. Click a deck name to study only that deck.
+1. Choose decks in the list on the left (on a phone, tap **Choose decks**), or click a cluster in the progress map to study one deck.
 2. Read the question and answer it in your head.
 3. Tap the card (or press **Space**) to flip it.
 4. Be honest: click **I knew it** or **Review again**.
