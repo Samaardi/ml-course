@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="description" content="Flashcards for the machine learning course: intro to ML, unsupervised learning, K-means, algorithms, seeds, scaling and cluster evaluation.">
-<title>K-means &amp; Seeds Flashcards</title>
+<title>Machine Learning Flashcards</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='3' y='6' width='26' height='20' rx='4' fill='%232F5D8A'/%3E%3Ccircle cx='11' cy='16' r='3' fill='%23fff'/%3E%3Ccircle cx='21' cy='13' r='2.2' fill='%23fff'/%3E%3Ccircle cx='20' cy='20' r='2.2' fill='%23fff'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -28,6 +28,12 @@
   --c-seed: #946C0E;
   --c-scale: #1F7A80;
   --c-eval: #A3456E;
+  --c-pca: #4D7C0F;
+  --c-tsne: #9D3D9B;
+  --c-dbscan: #0E6E9E;
+  --c-hdbscan: #7A5A2E;
+  --c-agglo: #B03A48;
+  --c-choose: #4B5563;
   --shadow: 0 1px 2px rgba(22,32,43,.06), 0 8px 24px rgba(22,32,43,.08);
   --f-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
   --f-body: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
@@ -37,7 +43,7 @@
   :root:not([data-theme="light"]) {
     --bg: #0F151C; --surface: #18212B; --surface-2: #212C38; --ink: #E6ECF2; --muted: #9AA8B6; --line: #2B3745;
     --accent: #7FAEDD; --good: #6CC193; --again: #F08A68;
-    --c-ml: #7FAEDD; --c-uml: #6CC193; --c-kmeans: #F08A68; --c-algo: #B79BE6; --c-seed: #E2B94D; --c-scale: #5CC4CB; --c-eval: #E58AB0;
+    --c-ml: #7FAEDD; --c-uml: #6CC193; --c-kmeans: #F08A68; --c-algo: #B79BE6; --c-seed: #E2B94D; --c-scale: #5CC4CB; --c-eval: #E58AB0; --c-pca: #A3D16A; --c-tsne: #DE8EDC; --c-dbscan: #6BC1EA; --c-hdbscan: #D2AE7A; --c-agglo: #F28A96; --c-choose: #B4BFCC;
     --shadow: 0 1px 2px rgba(0,0,0,.3), 0 10px 28px rgba(0,0,0,.35);
     color-scheme: dark;
   }
@@ -45,7 +51,7 @@
 :root[data-theme="dark"] {
   --bg: #0F151C; --surface: #18212B; --surface-2: #212C38; --ink: #E6ECF2; --muted: #9AA8B6; --line: #2B3745;
   --accent: #7FAEDD; --good: #6CC193; --again: #F08A68;
-  --c-ml: #7FAEDD; --c-uml: #6CC193; --c-kmeans: #F08A68; --c-algo: #B79BE6; --c-seed: #E2B94D; --c-scale: #5CC4CB; --c-eval: #E58AB0;
+  --c-ml: #7FAEDD; --c-uml: #6CC193; --c-kmeans: #F08A68; --c-algo: #B79BE6; --c-seed: #E2B94D; --c-scale: #5CC4CB; --c-eval: #E58AB0; --c-pca: #A3D16A; --c-tsne: #DE8EDC; --c-dbscan: #6BC1EA; --c-hdbscan: #D2AE7A; --c-agglo: #F28A96; --c-choose: #B4BFCC;
   --shadow: 0 1px 2px rgba(0,0,0,.3), 0 10px 28px rgba(0,0,0,.35);
   color-scheme: dark;
 }
@@ -175,8 +181,8 @@ footer button { font: inherit; color: var(--muted); background: none; border: 0;
 <body>
 <div class="wrap">
   <header>
-    <div class="eyebrow">Machine learning · Sessions 1–3</div>
-    <h1>K-means &amp; Seeds Flashcards</h1>
+    <div class="eyebrow">Machine learning · Sessions 1–5</div>
+    <h1>Machine Learning Flashcards</h1>
     <p class="lede">Review the ideas from our lessons and prepare for the scikit-learn certification exam. Read the question, answer it in your head, then flip the card and be honest about whether you knew it.</p>
   </header>
 
@@ -220,6 +226,12 @@ const DECKS = [
   { id: "seed",   name: "Seeds & random_state",  session: 2 },
   { id: "scale",  name: "Scaling & transformers", session: 3 },
   { id: "eval",   name: "Cluster evaluation & API", session: 3 },
+  { id: "pca",    name: "PCA",                    session: 4 },
+  { id: "tsne",   name: "t-SNE",                  session: 4 },
+  { id: "dbscan", name: "DBSCAN",                 session: 5 },
+  { id: "hdbscan", name: "HDBSCAN",               session: 5 },
+  { id: "agglo",  name: "Hierarchical clustering", session: 5 },
+  { id: "choose", name: "Choosing a method",      session: 5 },
 ];
 
 // q = question, a = answer. Inline markup: `code`, **bold**, blank line = new paragraph, "- " lines = list.
@@ -340,6 +352,120 @@ const CARDS = [
   ["eval", "Which call fails: `KMeans(3).fit(X).predict(X_new)`, `StandardScaler().fit(X).predict(X_new)`, `StandardScaler().fit(X).transform(X_new)`?", "`StandardScaler().fit(X).predict(X_new)`: a scaler has **no** `predict`."],
   ["eval", "Which methods does a Pipeline offer?", "Those of its **last** step. `make_pipeline(StandardScaler(), KMeans(3))` has `fit_predict` and `predict` because KMeans does."],
   ["eval", "Preview for the exam: which clustering algorithms have `fit_predict` but no `predict`?", "DBSCAN and AgglomerativeClustering. They label the data they were fitted on but can’t assign new points."],
+  // ---- PCA ----
+  ["pca", "What does PCA do?", "It finds new axes, the **principal components**, along which the data varies most, and keeps only the first few. This reduces the number of features while keeping as much of the information (variance) as possible."],
+  ["pca", "Is PCA supervised or unsupervised?", "**Unsupervised.** It uses only the features X, never labels: `PCA().fit(X)`."],
+  ["pca", "Why should you scale before PCA?", "PCA follows variance. A feature in large units (income in euros) has a huge variance and dominates PC1 just because of its units.\n\nUse `StandardScaler` first, ideally in a `Pipeline`."],
+  ["pca", "Does PCA centre or scale the data itself?", "It **centres** (subtracts each feature's mean, stored in `mean_`) but does **not scale**. Scaling is your job."],
+  ["pca", "What is a principal component?", "A new axis that is a **weighted mix of the original features**.\n\n- PC1: the direction with the most variance\n- PC2: the most remaining variance, perpendicular to PC1\n- and so on"],
+  ["pca", "In which order are the components returned?", "From the **most** explained variance to the least. PC1 always explains the most."],
+  ["pca", "What is the maximum number of components?", "The smaller of the number of samples and the number of features: `min(n_samples, n_features)`."],
+  ["pca", "What do `n_components=2`, `n_components=0.95` and `n_components=None` mean?", "- `2`: keep exactly 2 components\n- `0.95`: keep as many as needed to explain **95% of the variance**\n- `None` (default): keep all components"],
+  ["pca", "What does `explained_variance_ratio_` tell you?", "The **share of the total variance** each component captures, e.g. `[0.52, 0.36, …]`. With all components kept, it sums to 1."],
+  ["pca", "How do you choose the number of components?", "Plot the **cumulative** explained variance (`explained_variance_ratio_.cumsum()`) and keep enough to reach a threshold such as 90–95%, or look for the elbow. For a plot, use 2 or 3."],
+  ["pca", "What is stored in `components_`?", "The **loadings**: shape (n_components, n_features). Each row says how much each original feature contributes to that component."],
+  ["pca", "On PC2, the science subjects have negative loadings and the humanities positive. What does that mean?", "PC2 is a **trade-off** axis: a high PC2 score means stronger in humanities than sciences, a low score the opposite. Features with the same sign move together on that component."],
+  ["pca", "Can the signs of a component flip between runs or libraries?", "Yes. The direction of an axis is arbitrary: flipping all signs of a component describes the same axis. Interpret signs **relative to each other**."],
+  ["pca", "Which methods does PCA have?", "`fit`, `transform`, `fit_transform` and `inverse_transform`. **No** `predict`: it is a transformer, not a model."],
+  ["pca", "What does `inverse_transform` do?", "Maps reduced data back to the original features. The result is an **approximation**: the information in the dropped components is lost."],
+  ["pca", "X has shape (500, 10). What is the shape of `PCA(n_components=3).fit_transform(X)`?", "**(500, 3)**: same rows, one column per kept component."],
+  ["pca", "Can a fitted PCA be applied to new data?", "Yes: `pca.transform(X_new)` uses the components learned during `fit`. Fit on the **training data only**, to avoid leakage."],
+  ["pca", "Is PCA linear or non-linear?", "**Linear**: every component is a straight-line mix of features. It can't unfold curved shapes such as two moons or a spiral."],
+  ["pca", "Name three common uses of PCA.", "- Plotting high-dimensional data in 2D\n- Fewer features before a model or clustering (faster, less noise)\n- Removing correlated (redundant) features"],
+  ["pca", "Write a pipeline that scales, keeps 90% of the variance, then clusters into 3 groups.", "`make_pipeline(StandardScaler(), PCA(n_components=0.9), KMeans(n_clusters=3))`"],
+  ["pca", "After PCA, can you still name the features?", "Not directly. PC1 and PC2 are mixes of all features. Read the **loadings** (`components_`) to describe what each component stands for."],
+  // ---- t-SNE ----
+  ["tsne", "What is t-SNE used for?", "**Visualisation.** It maps high-dimensional data to 2D (or 3D) so that points that are similar end up close together on the map."],
+  ["tsne", "Is t-SNE linear or non-linear?", "**Non-linear.** It can show curved structures and separate groups that PCA would overlap."],
+  ["tsne", "What does t-SNE try to preserve?", "**Local neighbourhoods**: who is close to whom. It does not try to preserve global distances or the sizes of groups."],
+  ["tsne", "What is the most important hyperparameter of TSNE, and its default?", "`perplexity`, default **30**. Roughly how many neighbours each point pays attention to. Typical values are 5–50."],
+  ["tsne", "What rule must `perplexity` follow?", "It must be **smaller than the number of samples**. With 12 samples, the default of 30 raises an error."],
+  ["tsne", "What happens with a low vs a high perplexity?", "- **Low:** very local view; real groups can break into small fragments\n- **High:** broader view; small groups can blur together\n\nTry several values. Structure that appears in all of them is real."],
+  ["tsne", "Which methods does `TSNE` have?", "Only `fit` and `fit_transform`. **No `transform`**: it can't place new points on an existing map."],
+  ["tsne", "Why is t-SNE not used inside a pipeline before a classifier?", "It has no `transform`, so test data can't be mapped. t-SNE is for **looking** at data, not for creating features."],
+  ["tsne", "Why can two t-SNE runs give different maps?", "The optimisation is random. Set `random_state` to get the same map every time."],
+  ["tsne", "What does `init=\"pca\"` do, and is it the default?", "Starts the map from the PCA layout instead of random positions, which makes it more stable and keeps the global layout better. It **is** the default."],
+  ["tsne", "What can you trust on a t-SNE map?", "- Which points are neighbours\n- Which groups exist\n\nNot: **cluster sizes**, **distances between clusters**, or density."],
+  ["tsne", "Two clusters are far apart on a t-SNE map. Are they very different?", "**Not necessarily.** Distances between clusters on the map aren't meaningful."],
+  ["tsne", "What do the t-SNE axes mean?", "**Nothing.** Unlike PCA components, they have no units and no interpretation."],
+  ["tsne", "Should you scale before t-SNE?", "Yes. It is based on distances, so features with large units would dominate."],
+  ["tsne", "With hundreds of features, what is often done before t-SNE?", "**PCA** to about 50 dimensions first. It is faster and removes noise."],
+  ["tsne", "Should you run K-means on the t-SNE output?", "Better not: the map distorts distances. Cluster on the original (or PCA) data and use t-SNE to **show** the cluster labels as colours."],
+  ["tsne", "Why does t-SNE use a t-distribution on the map?", "Its heavy tails give the map more room, so dissimilar points are pushed further apart and the map doesn't collapse into one crowded blob."],
+  ["tsne", "Is t-SNE fast on large datasets?", "No. It is slow on large data. Use PCA first or a sample of the data."],
+  ["tsne", "PCA or t-SNE: which keeps global structure, and which shows local groups best?", "- **PCA:** global variance, linear, has `transform`, interpretable components, deterministic\n- **t-SNE:** local neighbourhoods, non-linear, no `transform`, meaningless axes, random"],
+  // ---- DBSCAN ----
+  ["dbscan", "What is the idea behind DBSCAN?", "A cluster is a **dense region** of points, separated from other dense regions by sparse space. Points in sparse space are **noise**."],
+  ["dbscan", "What does DBSCAN stand for?", "**D**ensity-**B**ased **S**patial **C**lustering of **A**pplications with **N**oise."],
+  ["dbscan", "What are DBSCAN's two main hyperparameters and their defaults?", "- `eps=0.5`: the neighbourhood radius\n- `min_samples=5`: points needed within `eps` for a point to be a core point"],
+  ["dbscan", "Does `min_samples` count the point itself?", "**Yes.** `min_samples=3` means the point plus at least 2 others within `eps`."],
+  ["dbscan", "What is a core point?", "A point with at least `min_samples` points (itself included) within `eps`. Only core points can **grow** a cluster."],
+  ["dbscan", "What is a border point?", "Not a core point itself, but within `eps` of a core point. It **joins** the cluster but doesn't spread it further."],
+  ["dbscan", "What is a noise point, and what label does it get?", "Neither core nor border. Its label is **`-1`**. It is not a cluster."],
+  ["dbscan", "Does DBSCAN have an `n_clusters` parameter?", "**No.** The number of clusters is an output, found from the data."],
+  ["dbscan", "How do you count DBSCAN's clusters from `labels`?", "`len(set(labels)) - (1 if -1 in labels else 0)`: subtract the noise label."],
+  ["dbscan", "What happens when you increase `eps`?", "Bigger neighbourhoods: **fewer, larger clusters and less noise**. Too large merges everything into one cluster."],
+  ["dbscan", "What happens when you decrease `eps`?", "More points become noise and clusters break into pieces."],
+  ["dbscan", "What happens when you increase `min_samples`?", "It is harder to be a core point: **more noise**, and only the densest regions stay clusters."],
+  ["dbscan", "How can you choose `eps`?", "With a **k-distance graph**: for every point, the distance to its k-th nearest neighbour (k = `min_samples`), sorted. Pick `eps` at the **knee**, where the curve shoots up."],
+  ["dbscan", "In a k-distance graph, what do the points below your chosen `eps` line become?", "**Core points.** Points above the line are border points or noise."],
+  ["dbscan", "What is a rule of thumb for `min_samples`?", "At least the number of features + 1, often **2 × the number of features**. Use more for noisy data."],
+  ["dbscan", "Which methods does DBSCAN have?", "`fit` and `fit_predict`. **No `predict`**: new points mean refitting."],
+  ["dbscan", "Which attributes does a fitted DBSCAN have?", "- `labels_`: cluster per point, `-1` = noise\n- `core_sample_indices_`: indices of core points\n- `components_`: the core points\n\nNo `cluster_centers_`, no `inertia_`."],
+  ["dbscan", "Why must you scale before DBSCAN?", "`eps` is **one distance for all features**. Without scaling, the feature with the largest units decides everything."],
+  ["dbscan", "Where does DBSCAN beat K-means?", "- Clusters of **any shape** (moons, rings)\n- Finding **outliers** (noise)\n- When you don't know the number of clusters"],
+  ["dbscan", "What are DBSCAN's main weaknesses?", "- Clusters with **different densities**: one `eps` can't fit all\n- Many dimensions: distances become similar\n- Sensitive to the choice of `eps`"],
+  ["dbscan", "Does DBSCAN have `random_state`?", "No. It is deterministic. Only a border point within reach of two clusters can depend on the data order."],
+  ["dbscan", "Which distance does DBSCAN use, and can you change it?", "Euclidean by default. Yes, via `metric` (e.g. `\"manhattan\"`). `eps` is then measured in that metric."],
+  ["dbscan", "What should you watch out for when computing a silhouette score for DBSCAN?", "Leave out the noise points (`-1`), and you need at least 2 clusters. Silhouette also prefers round clusters, so it can underrate a correct non-round result."],
+  ["dbscan", "You need to find unusual transactions in payment data. Why is DBSCAN a good fit?", "Its **noise points** (`-1`) are the transactions that don't belong to any dense group: candidate anomalies."],
+  // ---- HDBSCAN ----
+  ["hdbscan", "What is HDBSCAN?", "**Hierarchical DBSCAN.** It looks at the data at every density level and keeps the clusters that stay **stable** across levels. In scikit-learn since 1.3: `from sklearn.cluster import HDBSCAN`."],
+  ["hdbscan", "What is HDBSCAN's main advantage over DBSCAN?", "It finds clusters with **different densities**, and there is **no `eps` to choose**."],
+  ["hdbscan", "What is HDBSCAN's main hyperparameter and its default?", "`min_cluster_size=5`: the smallest group that counts as a cluster. Smaller groups become noise."],
+  ["hdbscan", "What does `min_samples` do in HDBSCAN, and what is its default?", "How conservative the clustering is. Larger values make more points noise. Default `None` means it equals `min_cluster_size`."],
+  ["hdbscan", "Does HDBSCAN need `eps` or `n_clusters`?", "**Neither.** The number of clusters is found from the data, and there's no radius to set."],
+  ["hdbscan", "What label does HDBSCAN give to noise?", "**`-1`**, as in DBSCAN."],
+  ["hdbscan", "What does `probabilities_` contain?", "How **strongly** each point belongs to its cluster, from 0 to 1. Noise points get 0."],
+  ["hdbscan", "Which methods does HDBSCAN have?", "`fit` and `fit_predict`. **No `predict`.**"],
+  ["hdbscan", "What is the difference between `cluster_selection_method=\"eom\"` and `\"leaf\"`?", "- `\"eom\"` (default): fewer, larger, most stable clusters\n- `\"leaf\"`: more, smaller, more uniform clusters"],
+  ["hdbscan", "Should you scale before HDBSCAN?", "Yes. Like DBSCAN, it is based on distances."],
+  ["hdbscan", "When might you still choose DBSCAN over HDBSCAN?", "When you know a meaningful distance threshold (`eps`) for your problem, or clusters have similar densities and you want the simpler model."],
+  ["hdbscan", "Does HDBSCAN have cluster centres?", "Not by default. Set `store_centers=\"centroid\"` or `\"medoid\"` to get `centroids_` or `medoids_`."],
+  // ---- Hierarchical clustering ----
+  ["agglo", "What is hierarchical clustering?", "Clustering that builds a **tree of clusters inside clusters**, so the same result can be read as 2, 3 or 10 clusters."],
+  ["agglo", "Agglomerative vs divisive: what's the difference?", "- **Agglomerative:** bottom-up, start with single points and merge\n- **Divisive:** top-down, start with one cluster and split\n\nscikit-learn implements agglomerative: `AgglomerativeClustering`."],
+  ["agglo", "How does agglomerative clustering work?", "1. Every point starts as its own cluster.\n2. Merge the **two closest clusters**.\n3. Repeat until the stopping point (the number of clusters or a distance threshold)."],
+  ["agglo", "What is a dendrogram?", "A tree diagram of every merge. The **height** of a merge shows how far apart the two clusters were."],
+  ["agglo", "How do you get a number of clusters from a dendrogram?", "**Cut** it with a horizontal line. The number of vertical lines it crosses is the number of clusters. Cut through the longest vertical lines."],
+  ["agglo", "What are the defaults of `AgglomerativeClustering`?", "`n_clusters=2`, `linkage=\"ward\"`, `metric=\"euclidean\"`."],
+  ["agglo", "What is the difference between `n_clusters` and `distance_threshold`?", "Set **one**, and the other to `None`:\n\n- `n_clusters`: stop at this many clusters\n- `distance_threshold`: cut the tree at this height; read the result from `n_clusters_`"],
+  ["agglo", "What does the `linkage` parameter decide?", "How the distance **between two clusters** is measured, and so which clusters merge first."],
+  ["agglo", "Name the four linkages and what each compares.", "- `ward`: the merge that adds the least variance\n- `complete`: the farthest pair of points\n- `average`: the average over all pairs\n- `single`: the closest pair of points"],
+  ["agglo", "Which linkage can find long or curved clusters, and what is its weakness?", "**Single.** It follows chains of close points, but one stray point can bridge two clusters (chaining)."],
+  ["agglo", "Which linkage is most similar to K-means?", "**Ward.** It keeps clusters compact and similar in size."],
+  ["agglo", "Which distance does `ward` linkage require?", "**Euclidean only.** Other metrics need `complete`, `average` or `single`."],
+  ["agglo", "Which methods does `AgglomerativeClustering` have?", "`fit` and `fit_predict`. **No `predict`**: new points mean refitting."],
+  ["agglo", "Does `AgglomerativeClustering` have `random_state`?", "**No.** It is deterministic: the same data always gives the same tree."],
+  ["agglo", "How do you draw a dendrogram?", "With SciPy, not scikit-learn: `Z = linkage(X, method=\"ward\")`, then `dendrogram(Z)` from `scipy.cluster.hierarchy`."],
+  ["agglo", "Should you scale before agglomerative clustering?", "Yes. Merges are decided by distances."],
+  ["agglo", "Is agglomerative clustering a good choice for millions of rows?", "No. It compares all pairs of points, so memory grows with the square of the number of rows. K-means scales much better."],
+  ["agglo", "What is the main advantage of hierarchical clustering?", "You see the structure at **every level**, and you can choose the number of clusters **after** fitting by cutting the tree."],
+  ["agglo", "How does agglomerative clustering handle outliers?", "It has no noise label. Outliers join the tree **late** and can end up as tiny clusters of their own."],
+  ["agglo", "Which parameter replaced `affinity` in `AgglomerativeClustering`?", "**`metric`**. `affinity` was removed in scikit-learn 1.4, so older tutorials may not run."],
+  // ---- Choosing a method ----
+  ["choose", "What is the difference between Euclidean and Manhattan distance?", "- **Euclidean:** the straight-line distance\n- **Manhattan:** the sum of the differences along each axis, like walking city blocks\n\nFrom (1, 1) to (4, 5): Euclidean 5, Manhattan 7."],
+  ["choose", "Which distance do K-means, DBSCAN and AgglomerativeClustering use by default, and which can change it?", "All use **Euclidean**.\n\n- K-means: can't change it\n- DBSCAN: any `metric`\n- Agglomerative: any `metric`, except with `ward`"],
+  ["choose", "Which of K-means, DBSCAN, HDBSCAN and AgglomerativeClustering have `predict`?", "Only **K-means**. The others have `fit_predict` only."],
+  ["choose", "Which clustering algorithms label noise?", "**DBSCAN** and **HDBSCAN** (label `-1`). K-means and agglomerative put every point in a cluster."],
+  ["choose", "Which algorithms need the number of clusters?", "K-means (`n_clusters`) and agglomerative (`n_clusters`, or a `distance_threshold` instead). DBSCAN and HDBSCAN find it themselves."],
+  ["choose", "Which clustering algorithm has `random_state`?", "**K-means** (random starting centroids). DBSCAN, HDBSCAN and agglomerative are deterministic."],
+  ["choose", "Which algorithms need scaled data?", "**All of them.** They all compare distances between points."],
+  ["choose", "You want 4 customer segments of similar size on a large dataset. Which algorithm?", "**K-means.** You know the number of groups, the groups are compact, and it is fast."],
+  ["choose", "GPS pickups along streets, plus some random noise. Which algorithm?", "**DBSCAN or HDBSCAN.** The clusters have irregular shapes and the noise must be left out."],
+  ["choose", "Your clusters have very different densities. Which algorithm?", "**HDBSCAN.** One `eps` in DBSCAN can't fit dense and sparse clusters at the same time."],
+  ["choose", "You want a family tree of product categories. Which algorithm?", "**Agglomerative clustering**, with a dendrogram to show the levels."],
+  ["choose", "Your data has 50 features. How can you look at the clusters?", "Reduce to 2D with **PCA** or **t-SNE** and colour the points by cluster label."],
 ].map(c => ({ id: c[0] + "-" + hash(c[1]), deck: c[0], q: c[1], a: c[2] }));
 
 const deckById = Object.fromEntries(DECKS.map(d => [d.id, d]));
@@ -355,6 +481,15 @@ const state = {
   order: [], pos: 0, flipped: false,
 };
 if (!state.decks.size) DECKS.forEach(d => state.decks.add(d.id));
+// New decks: add them for visitors who had all the decks they knew about selected.
+{
+  const seen = Array.isArray(store.seen) ? store.seen : ["ml", "uml", "kmeans", "algo", "seed", "scale", "eval"];
+  const hadAll = seen.every(id => !deckById[id] || state.decks.has(id));
+  if (hadAll) DECKS.forEach(d => { if (!seen.includes(d.id)) state.decks.add(d.id); });
+  store.seen = DECKS.map(d => d.id);
+  if (store.decks) store.decks = [...state.decks];
+  save();
+}
 
 function esc(s) { return s.replace(/[&<>"]/g, ch => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[ch])); }
 function inline(s) {
@@ -400,7 +535,7 @@ function drawChips() {
   all.innerHTML = 'All decks <span class="n">' + CARDS.length + "</span>";
   all.onclick = () => { DECKS.forEach(d => state.decks.add(d.id)); store.decks = [...state.decks]; save(); drawChips(); rebuild(false); };
   row.appendChild(all);
-  [1, 2, 3].forEach(sess => {
+  [...new Set(DECKS.map(d => d.session))].forEach(sess => {
     const lab = document.createElement("span");
     lab.className = "rowlabel"; lab.textContent = "Session " + sess;
     lab.style.marginLeft = "6px";
