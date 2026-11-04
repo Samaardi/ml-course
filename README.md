@@ -2,7 +2,7 @@
  
 Study materials for a machine learning course covering unsupervised learning (UML) and supervised learning (SML), and preparing for the **scikit-learn Associate Practitioner** certification by Probabl.
  
-## 👉 [Open the flashcards](https://samaardi.github.io/ml-flashcards/)
+## 👉 [Open the flashcards](https://samaardi.github.io/ml-course/)
  
 ## 📊 [Machine Learning Reference Tables](Machine%20Learning%20Reference%20Tables.md)
  
