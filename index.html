@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="description" content="209 flashcards on machine learning with scikit-learn: foundations, preprocessing, clustering (K-means, DBSCAN, HDBSCAN, hierarchical) and dimensionality reduction (PCA, t-SNE). Built for the scikit-learn Associate Practitioner exam.">
+<meta name="description" content="350 flashcards on machine learning with scikit-learn: preprocessing, clustering, dimensionality reduction, classification (decision trees, KNN, SVM, logistic regression, random forests), model evaluation and regression. Built for the scikit-learn Associate Practitioner exam.">
 <title>Machine Learning Flashcards</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%231E4F7A'/%3E%3Ccircle cx='10' cy='11' r='3' fill='%23fff'/%3E%3Ccircle cx='15' cy='9' r='2.2' fill='%23fff' opacity='.7'/%3E%3Ccircle cx='21' cy='21' r='3' fill='%23fff'/%3E%3Ccircle cx='24' cy='16' r='2.2' fill='%23fff' opacity='.7'/%3E%3Ccircle cx='11' cy='22' r='1.8' fill='%23fff' opacity='.45'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -24,6 +24,9 @@
   --c-scale: #1F7A80;
   --c-kmeans: #B4492A; --c-eval: #A3456E; --c-dbscan: #0E6E9E; --c-hdbscan: #7A5A2E; --c-agglo: #B03A48; --c-choose: #4B5563;
   --c-pca: #4D7C0F; --c-tsne: #9D3D9B;
+  --c-sml: #3B5BA9; --c-prep: #0F766E; --c-metrics: #A15C07; --c-cv: #5B4BA8; --c-biasvar: #8A3B12;
+  --c-tree: #3F6212; --c-knn: #0369A1; --c-svm: #9F1239; --c-logreg: #6D28D9; --c-rf: #166534;
+  --c-reg: #9A3412; --c-linreg: #1E40AF; --c-ts: #854D0E;
   --shadow: 0 1px 2px rgba(23,32,43,.05), 0 6px 20px rgba(23,32,43,.07);
   --f-serif: "Newsreader", "Iowan Old Style", Georgia, serif;
   --f-sans: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
@@ -36,6 +39,9 @@
     --c-ml: #7FAEDD; --c-uml: #6CC193; --c-algo: #B79BE6; --c-seed: #E2B94D; --c-scale: #5CC4CB;
     --c-kmeans: #F08A68; --c-eval: #E58AB0; --c-dbscan: #6BC1EA; --c-hdbscan: #D2AE7A; --c-agglo: #F28A96; --c-choose: #B4BFCC;
     --c-pca: #A3D16A; --c-tsne: #DE8EDC;
+    --c-sml: #8EA6E8; --c-prep: #5CCDBF; --c-metrics: #E9A752; --c-cv: #A99CF0; --c-biasvar: #E59A6E;
+    --c-tree: #A6CF6B; --c-knn: #6CC0EE; --c-svm: #F28BA8; --c-logreg: #C4A5F8; --c-rf: #74D39A;
+    --c-reg: #F3A27A; --c-linreg: #93B0F5; --c-ts: #E7BE6C;
     --shadow: 0 1px 2px rgba(0,0,0,.3), 0 10px 28px rgba(0,0,0,.35);
     color-scheme: dark;
   }
@@ -53,9 +59,9 @@ button { font: inherit; color: inherit; }
 }
 
 /* ---------- header ---------- */
-.top { display: grid; grid-template-columns: minmax(0, 1fr) 460px; gap: 32px; align-items: center; padding-bottom: 28px; border-bottom: 1px solid var(--line); }
+.top { display: grid; grid-template-columns: 1fr; gap: 22px; padding-bottom: 24px; border-bottom: 1px solid var(--line); }
 h1 { font-family: var(--f-serif); font-weight: 500; font-size: clamp(34px, 5vw, 50px); line-height: 1.04; letter-spacing: -.015em; margin: 0 0 14px; }
-.lede { margin: 0; color: var(--muted); max-width: 54ch; font-size: 17px; }
+.lede { margin: 0; color: var(--muted); max-width: 68ch; font-size: 17px; }
 .lede strong { color: var(--ink); font-weight: 500; }
 .map { margin: 0; }
 .map svg { display: block; width: 100%; height: auto; }
@@ -65,6 +71,8 @@ h1 { font-family: var(--f-serif); font-weight: 500; font-size: clamp(34px, 5vw, 
 .map .cl:focus-visible { outline: none; }
 .map .cl:focus-visible .halo { stroke: var(--accent); stroke-width: 1.5; }
 .map .lab { font: 500 11px var(--f-sans); fill: var(--muted); }
+.map .glab { font: 600 11.5px var(--f-sans); fill: var(--ink); }
+.map .gline { stroke: var(--line); stroke-width: 1.5; }
 .map figcaption { display: flex; flex-wrap: wrap; gap: 4px 16px; font-size: 12.5px; color: var(--muted); margin-top: 6px; }
 .map figcaption span { display: inline-flex; align-items: center; gap: 6px; }
 .lg { width: 9px; height: 9px; border-radius: 50%; display: inline-block; }
@@ -177,8 +185,7 @@ footer .linkbtn { font-size: 13px; }
 /* ---------- responsive ---------- */
 .decks-toggle { display: none; }
 @media (max-width: 820px) {
-  .top { grid-template-columns: 1fr; gap: 20px; }
-  .map { max-width: 520px; }
+  .top { gap: 18px; }
   .layout { grid-template-columns: 1fr; gap: 20px; }
   .decks { position: static; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); }
   .decks-toggle { display: flex; width: 100%; justify-content: space-between; align-items: center; gap: 12px; background: none; border: 0; padding: 13px 16px; cursor: pointer; text-align: left; border-radius: 12px; }
@@ -190,7 +197,6 @@ footer .linkbtn { font-size: 13px; }
   .decks-head { padding: 0 6px; }
 }
 @media (min-width: 821px) and (max-width: 1020px) {
-  .top { grid-template-columns: minmax(0, 1fr) 380px; }
   .layout { grid-template-columns: 250px minmax(0, 1fr); gap: 28px; }
   .dname { font-size: 14px; }
 }
@@ -213,10 +219,10 @@ footer .linkbtn { font-size: 13px; }
   <header class="top">
     <div>
       <h1>Machine Learning Flashcards</h1>
-      <p class="lede">Core concepts, hyperparameters and scikit-learn behaviour for unsupervised learning, in <strong>209 cards</strong>. Written to prepare for the scikit-learn Associate Practitioner exam, and useful as a quick refresher.</p>
+      <p class="lede">Core concepts, hyperparameters and scikit-learn behaviour for supervised and unsupervised learning: preprocessing, clustering, dimensionality reduction, classification and regression, in <strong>350 cards</strong>. Written to prepare for the scikit-learn Associate Practitioner exam, and useful as a quick refresher.</p>
     </div>
     <figure class="map" aria-label="Your progress: one cluster per deck, one dot per card">
-      <svg id="map" viewBox="0 0 440 236" role="group"></svg>
+      <svg id="map" viewBox="0 0 1260 184" role="group"></svg>
       <figcaption><span><i class="lg k"></i>Known</span><span><i class="lg a"></i>Review again</span><span><i class="lg u"></i>Not seen yet</span><span>Click a cluster to study that deck</span></figcaption>
     </figure>
   </header>
@@ -258,9 +264,12 @@ footer .linkbtn { font-size: 13px; }
 <script>
 const GROUPS = [
   { name: "Foundations", decks: ["ml", "uml", "algo", "seed"] },
-  { name: "Preprocessing", decks: ["scale"] },
+  { name: "Preprocessing", decks: ["scale", "prep"] },
   { name: "Clustering", decks: ["kmeans", "eval", "dbscan", "hdbscan", "agglo", "choose"] },
   { name: "Dimensionality reduction", decks: ["pca", "tsne"] },
+  { name: "Supervised learning and evaluation", short: "Supervised basics", decks: ["sml", "metrics", "cv", "biasvar"] },
+  { name: "Classification algorithms", short: "Classifiers", decks: ["tree", "knn", "svm", "logreg", "rf"] },
+  { name: "Regression", decks: ["reg", "linreg"] },
 ];
 const DECKS = [
   { id: "ml", name: "What is ML?" },
@@ -268,6 +277,7 @@ const DECKS = [
   { id: "algo", name: "Algorithms" },
   { id: "seed", name: "Randomness and random_state", short: "Randomness" },
   { id: "scale", name: "Scaling and transformers", short: "Scaling" },
+  { id: "prep", name: "Imputation, encoding and pipelines", short: "Imputation" },
   { id: "kmeans", name: "K-means" },
   { id: "eval", name: "Evaluation and estimator API", short: "Evaluation" },
   { id: "dbscan", name: "DBSCAN" },
@@ -276,13 +286,37 @@ const DECKS = [
   { id: "choose", name: "Choosing a method", short: "Choosing" },
   { id: "pca", name: "PCA" },
   { id: "tsne", name: "t-SNE" },
+  { id: "sml", name: "Supervised learning basics", short: "Basics" },
+  { id: "metrics", name: "Classification metrics", short: "Metrics" },
+  { id: "cv", name: "Cross-validation and tuning", short: "CV & tuning" },
+  { id: "biasvar", name: "Bias, variance and regularization", short: "Bias–variance" },
+  { id: "tree", name: "Decision trees", short: "Trees" },
+  { id: "knn", name: "K-nearest neighbours", short: "KNN" },
+  { id: "svm", name: "Support vector machines", short: "SVM" },
+  { id: "logreg", name: "Logistic regression", short: "Logistic" },
+  { id: "rf", name: "Random forests", short: "Forests" },
+  { id: "reg", name: "Regression basics and metrics", short: "Reg. basics" },
+  { id: "linreg", name: "Linear regression", short: "Linear" },
 ];
-// Cluster centres on the progress map (viewBox 440 x 178), grouped by topic.
-const POS = {
-  ml: [44, 42], uml: [128, 50], algo: [48, 132], seed: [132, 124],
-  scale: [214, 44], pca: [210, 128], tsne: [218, 198],
-  kmeans: [300, 46], agglo: [392, 52], eval: [296, 128], dbscan: [390, 134], hdbscan: [304, 202], choose: [394, 204],
-};
+// Progress map: groups flow left to right, two decks per column, each group with a vertical label; wraps on narrow screens.
+const NARROW = window.matchMedia("(max-width: 700px)");
+const COLW = 74, ROWH = 92, LABW = 28, GAP = 22;
+let POS = {}, GPOS = [];
+function layoutMap(maxW) {
+  POS = {}; GPOS = [];
+  let x = 0, row = 0, widest = 0;
+  const rowH = 2 * ROWH + GAP;
+  GROUPS.forEach(g => {
+    const cols = Math.ceil(g.decks.length / 2), w = LABW + cols * COLW;
+    if (x > 0 && x + w > maxW) { x = 0; row += 1; }
+    const y0 = row * rowH;
+    GPOS.push({ g, x: x + 11, y0, h: 2 * ROWH });
+    g.decks.forEach((id, i) => { POS[id] = [x + LABW + COLW / 2 + Math.floor(i / 2) * COLW, y0 + ROWH / 2 + (i % 2) * ROWH - 4]; });
+    x += w; widest = Math.max(widest, x);
+  });
+  return { w: widest, h: (row + 1) * rowH - GAP };
+}
+NARROW.addEventListener("change", () => drawMap());
 
 // q = question, a = answer. Inline markup: `code`, **bold**, blank line = new paragraph, "- " lines = list.
 function hash(t) { let h = 5381; for (let i = 0; i < t.length; i++) h = ((h << 5) + h + t.charCodeAt(i)) >>> 0; return h.toString(36); }
@@ -359,6 +393,21 @@ const CARDS = [
   ["scale", "A ColumnTransformer lists only `age` and `income`, but the table also has `score`. What happens to `score`?", "It is **dropped** (the default is `remainder=\"drop\"`). Use `remainder=\"passthrough\"` to keep it unchanged."],
   ["scale", "Why put the scaler and K-means in a `Pipeline`?", "The steps always run in the right order, with the right method: `fit` does `fit_transform` on the scaler, then `fit` on K-means; `predict` does `transform`, then `predict`. That prevents leakage and forgotten steps."],
   ["scale", "In `make_pipeline(StandardScaler(), KMeans())`, how do you set the number of clusters to 4?", "`pipe.set_params(kmeans__n_clusters=4)`\n\nStep name (lower-case class name with `make_pipeline`), then **two underscores**, then the parameter."],
+  // ---- Imputation, encoding and pipelines ----
+  ["prep", "What does `SimpleImputer()` do by default?", "Replaces missing values (`NaN`) with the column **mean** learned during `fit`.\n\nOther strategies: `\"median\"`, `\"most_frequent\"`, `\"constant\"` (with `fill_value`)."],
+  ["prep", "Why fit the imputer on the training data only?", "`fit` learns the fill values, such as the mean. Computing them with test rows leaks test information.\n\nSo: `fit_transform` on the training set, then only `transform` on the test set, using the training mean."],
+  ["prep", "Which imputation strategy for which column?", "- Skewed numbers or outliers (Titanic `Fare`): `\"median\"`\n- Roughly symmetric numbers: `\"mean\"`\n- Categories (`Embarked`): `\"most_frequent\"` or `\"constant\"`"],
+  ["prep", "What does `add_indicator=True` do in `SimpleImputer`?", "Adds a 0/1 column for each feature that had missing values, marking which rows were filled in. The model can then learn whether \"missing\" itself carries information, as with Titanic's `Age`."],
+  ["prep", "Why can't most models use text categories directly?", "They compute with numbers. Encode categories first: `OneHotEncoder` for categories without an order, `OrdinalEncoder` for ordered ones."],
+  ["prep", "What does one-hot encoding produce?", "One 0/1 column per category. `Embarked` with values S, C and Q becomes three columns, and each row has a single 1."],
+  ["prep", "Why not use `OrdinalEncoder` for a category like port of embarkation?", "It invents an order and distances (S=2 > Q=1 > C=0) that linear models and KNN take literally.\n\nFine for truly ordered categories (low < medium < high) and usually harmless for tree models."],
+  ["prep", "What happens when the test set contains a category that `OneHotEncoder` never saw?", "- Default `handle_unknown=\"error\"`: an error\n- `handle_unknown=\"ignore\"`: the row gets all zeros, with a warning\n- `\"infrequent_if_exist\"`: mapped to the infrequent category, if one was defined"],
+  ["prep", "What does `drop=\"first\"` do, and what is the catch?", "Drops one column per feature, which avoids perfect collinearity (the dummy variable trap) in unregularised linear models.\n\nCatch: with `handle_unknown=\"ignore\"`, an unknown category and the dropped category both become all zeros."],
+  ["prep", "Why is `pd.get_dummies` risky in a modelling workflow?", "It does not remember categories. Run separately on training and test data, it can produce different columns when a category is missing from one of them. `OneHotEncoder` learns the categories in `fit` and reuses them."],
+  ["prep", "What does `sparse_output` control in `OneHotEncoder`?", "The default `True` returns a sparse matrix. Set `sparse_output=False` for a dense array; it is required when the pipeline uses `set_output(transform=\"pandas\")`."],
+  ["prep", "What does `ColumnTransformer` do, and what is its default for unlisted columns?", "Applies different preprocessing to different columns (scale the numbers, one-hot the categories) and joins the results.\n\nDefault `remainder=\"drop\"`: columns you did not list are **silently dropped**. Use `\"passthrough\"` to keep them."],
+  ["prep", "Why put preprocessing inside a `Pipeline`?", "- Each step is fitted on training data only, also inside every cross-validation fold\n- The same transformations are applied at prediction time\n- One object to tune, evaluate and save\n\nIt is the standard defence against leakage."],
+  ["prep", "How do you name a pipeline step's parameter in a grid search?", "Step name, two underscores, parameter: `\"model__max_depth\"`, or deeper, `\"preprocess__num__imputer__strategy\"`.\n\n`make_pipeline` names steps after the lowercase class name, such as `\"decisiontreeclassifier\"`."],
   // ---- K-means ----
   ["kmeans", "Explain K-means in plain words.", "Open K pizza shops anywhere in a city. Each house goes to its nearest shop. Each shop then moves to the centre of its customers. Repeat until no shop moves.\n\nThe shops are the **centroids**; the houses are the data points."],
   ["kmeans", "What is a centroid?", "The centre of a cluster: the mean (average) of all points in it."],
@@ -509,6 +558,144 @@ const CARDS = [
   ["tsne", "Why does t-SNE use a t-distribution on the map?", "Its heavy tails give the map more room, so dissimilar points are pushed further apart and the map doesn't collapse into one crowded blob."],
   ["tsne", "Is t-SNE fast on large datasets?", "No. It is slow on large data. Use PCA first or a sample of the data."],
   ["tsne", "PCA or t-SNE: which keeps global structure, and which shows local groups best?", "- **PCA:** global variance, linear, has `transform`, interpretable components, deterministic\n- **t-SNE:** local neighbourhoods, non-linear, no `transform`, meaningless axes, random"],
+  // ---- Supervised learning basics ----
+  ["sml", "What makes a learning problem **supervised**?", "Every training example comes with the answer (the label or target). The model learns the mapping from features to target and is judged on examples it has not seen."],
+  ["sml", "Classification vs regression?", "- **Classification** predicts a category: survived or died, spam or not spam\n- **Regression** predicts a number: a price, a disease-progression score\n\nSame estimator API (`fit`, `predict`), different metrics."],
+  ["sml", "What are `X` and `y`?", "- `X`: the features, a 2D table with one row per sample and one column per feature\n- `y`: the target, 1D, one value per row\n\nThe capital X is a convention: it is a matrix."],
+  ["sml", "Which methods does every supervised estimator have?", "- `fit(X, y)` learns from the training data\n- `predict(X)` returns predictions\n- `score(X, y)` returns **accuracy** for classifiers and **R²** for regressors\n\nMost classifiers also have `predict_proba`."],
+  ["sml", "Why hold out a test set?", "To estimate performance on new data. A model scored on its own training data looks better than it is, because it may have memorised those rows.\n\nLook at the test set once, at the end."],
+  ["sml", "What does `train_test_split` do by default?", "Shuffles the rows (`shuffle=True`) and puts **25%** in the test set when neither `test_size` nor `train_size` is given.\n\nSet `random_state` to get the same split every run."],
+  ["sml", "What does `stratify=y` do in `train_test_split`?", "Keeps the class proportions the same in the training and test sets. Important for imbalanced classes: on Titanic about 38% survived, and both sets keep that share."],
+  ["sml", "What is a baseline model, and why build one first?", "The simplest sensible prediction, such as always predicting the most common class. Every real model must beat it; otherwise it has learned nothing useful."],
+  ["sml", "What does `DummyClassifier()` predict by default?", "`strategy=\"prior\"`: always the most frequent class in the training data, and `predict_proba` returns the class proportions.\n\nOn Titanic it predicts \"died\" for everyone: about 62% accuracy."],
+  ["sml", "What is a heuristic (rule-based) model?", "Rules a person writes after exploring the data, such as \"women survive, men die\" on Titanic (about 79% accuracy on Kaggle's training data).\n\nA stronger baseline than a dummy. Choose the rule on the training data and check it on the test set once."],
+  ["sml", "What is data leakage?", "Information the model would not have at prediction time gets into training: test rows, future values, or the target itself. Example: fitting a scaler on all the data before splitting.\n\nResult: scores that look better than reality. Fix: split first, and put preprocessing inside a `Pipeline`."],
+  // ---- Classification metrics ----
+  ["metrics", "How does scikit-learn lay out a confusion matrix?", "Rows are the **true** classes, columns the **predicted** classes. For binary labels 0 and 1:\n\n`[[TN, FP], [FN, TP]]`\n\nPlot it with `ConfusionMatrixDisplay.from_estimator` or `.from_predictions`."],
+  ["metrics", "Accuracy: formula, and when does it mislead?", "(TP + TN) / all predictions.\n\nIt misleads with imbalanced classes: if 99% of patients are healthy, always predicting \"healthy\" scores 99% and finds no one who is ill."],
+  ["metrics", "Precision: formula and meaning?", "TP / (TP + FP): of everything predicted positive, how much really is positive?\n\nPrioritise it when false alarms are costly, such as a spam filter deleting real mail."],
+  ["metrics", "Recall: formula and meaning?", "TP / (TP + FN): of all real positives, how many did the model find? Also called sensitivity or true positive rate.\n\nPrioritise it when misses are costly: cancer screening, fraud."],
+  ["metrics", "What is specificity, and where is it in `classification_report`?", "TN / (TN + FP): the share of real negatives correctly identified.\n\nIt has no column of its own. In a binary report, it is the **recall of the negative class** row."],
+  ["metrics", "F1 score: formula, and why a harmonic mean?", "`F1 = 2·P·R / (P + R)`\n\nThe harmonic mean is pulled towards the smaller value. Precision 1.0 with recall 0.1 has an ordinary mean of 0.55, but F1 is only 0.18. F1 is high only when both are high."],
+  ["metrics", "What is the precision–recall trade-off?", "Lowering the decision threshold labels more samples positive: recall rises, precision falls. Raising it does the opposite.\n\nThe default threshold is 0.5 on `predict_proba`. `TunedThresholdClassifierCV` can choose a better one."],
+  ["metrics", "What are the columns of `classification_report`?", "- **precision**, **recall**, **f1-score** for each class\n- **support**: the number of true samples of that class\n\nBelow them: overall accuracy, the macro average and the weighted average."],
+  ["metrics", "Macro average vs weighted average?", "- **Macro**: plain mean over classes. Every class counts equally, so a poorly predicted small class pulls it down\n- **Weighted**: mean weighted by support. Dominated by the large classes"],
+  ["metrics", "Which metrics suit imbalanced classes?", "Not plain accuracy. Use precision, recall or F1 for the minority class, `balanced_accuracy` (mean recall over classes), or threshold-free scores such as ROC AUC and average precision."],
+  ["metrics", "What does ROC AUC measure?", "The ROC curve plots true positive rate against false positive rate over all thresholds. AUC is the area under it: 0.5 is random guessing, 1.0 a perfect ranking.\n\nIt needs scores or probabilities, not hard labels."],
+  ["metrics", "Which class counts as positive in `precision_score` and `recall_score`?", "`pos_label=1` by default. With string labels such as `\"yes\"`/`\"no\"`, set `pos_label` yourself."],
+  ["metrics", "Scoring strings for classification?", "`\"accuracy\"`, `\"balanced_accuracy\"`, `\"precision\"`, `\"recall\"`, `\"f1\"`, `\"f1_macro\"`, `\"roc_auc\"`. Use them in `cross_val_score` and `GridSearchCV`."],
+  // ---- Cross-validation and tuning ----
+  ["cv", "Why use cross-validation instead of a single train/validation split?", "A single split's score depends on which rows happened to land in the validation set. K-fold uses every row for validation once and gives a mean **and** a spread."],
+  ["cv", "How does 5-fold cross-validation work?", "Split the training data into 5 folds. In each of 5 rounds, fit a fresh copy of the model on 4 folds and only predict and score on the remaining fold. Report the 5 scores and their mean."],
+  ["cv", "What is the default `cv` in `cross_val_score` and `GridSearchCV`?", "`cv=None` means **5 folds**: `StratifiedKFold` for classifiers, plain `KFold` without shuffling for everything else."],
+  ["cv", "Does `KFold` shuffle by default?", "No: `shuffle=False`. If the rows are sorted, by class or by date, the folds are biased. Set `shuffle=True` with a `random_state`, except for time series."],
+  ["cv", "When do you use `GroupKFold`?", "When several rows belong to the same entity: a patient, a user, an artist. All rows of a group stay on the same side, so the model cannot score well just by recognising the individual."],
+  ["cv", "How does `TimeSeriesSplit` differ from `KFold`?", "The training data always comes **before** the test data, in an expanding window: never train on the future. Default `n_splits=5`; `gap` leaves space between training and test periods."],
+  ["cv", "`cross_val_score` vs `cross_validate`?", "- `cross_val_score`: one metric, returns an array of scores\n- `cross_validate`: several metrics, fit and score times, and optionally training scores (`return_train_score=True`) and the fitted estimators"],
+  ["cv", "Hyperparameter vs parameter?", "- **Hyperparameter**: set before training, such as `max_depth`, `n_neighbors`, `C`\n- **Parameter**: learned in `fit`, such as coefficients or split thresholds\n\nTune hyperparameters with cross-validation, never on the test set."],
+  ["cv", "What does `GridSearchCV` do?", "Tries every combination in `param_grid`, scores each with cross-validation and picks the best mean score. With `refit=True` (the default) it then refits that combination on the whole training set."],
+  ["cv", "Key attributes of a fitted `GridSearchCV`?", "- `best_params_`: the winning combination\n- `best_score_`: its **mean CV score**, not a test score\n- `best_estimator_`: the refitted model\n- `cv_results_`: every candidate's scores"],
+  ["cv", "Should a pipeline be fitted before you pass it to `GridSearchCV`?", "No. The search clones the estimator and fits the clones, so any earlier fit is ignored. Pass the unfitted pipeline and call `search.fit(X_train, y_train)`; the search object then predicts with the best model."],
+  ["cv", "How many fits does a grid of 3 × 4 values with 5-fold CV run?", "3 × 4 = 12 combinations × 5 folds = **60 fits**, plus 1 final refit."],
+  ["cv", "When is `RandomizedSearchCV` the better choice?", "For large search spaces or continuous hyperparameters. It samples `n_iter` combinations (default 10) from lists or distributions, such as `loguniform` for `C`."],
+  ["cv", "Why is `best_score_` optimistic, and what fixes it?", "It is the maximum over many candidates, so some of it is luck. Report final performance on an untouched test set, or use **nested cross-validation**: an outer loop evaluates the whole search."],
+  ["cv", "Why must preprocessing be inside the pipeline you cross-validate?", "Otherwise the scaler or imputer has already seen the validation fold, which is leakage, and the CV scores are too optimistic."],
+  // ---- Bias, variance and regularization ----
+  ["biasvar", "What is bias?", "Error from a model too simple to capture the pattern: it is systematically wrong. High bias means underfitting, like a straight line through a curved relationship."],
+  ["biasvar", "What is variance?", "Error from sensitivity to the particular training sample: a slightly different sample gives a very different model. High variance means overfitting, like a fully grown decision tree."],
+  ["biasvar", "What is the bias–variance trade-off?", "More flexibility lowers bias but raises variance. The best model sits where total test error is lowest.\n\n`expected error = bias² + variance + irreducible noise`"],
+  ["biasvar", "How do training and validation scores reveal bias or variance?", "- Both low: high bias, underfitting\n- Training high, validation much lower: high variance, overfitting\n- Both high and close together: a good fit"],
+  ["biasvar", "What is regularization?", "Anything that limits model complexity to reduce variance:\n\n- Constraints: `max_depth`, `min_samples_leaf`\n- Penalties: `alpha` in Ridge and Lasso, `C` in SVM and logistic regression\n- Averaging: random forests"],
+  ["biasvar", "Which direction means **more** regularization?", "- Decision tree: smaller `max_depth`, larger `min_samples_leaf`, larger `ccp_alpha`\n- KNN: larger `n_neighbors`\n- SVM and logistic regression: **smaller** `C`\n- Ridge and Lasso: larger `alpha`"],
+  ["biasvar", "How do you reduce high variance?", "More training data, stronger regularization, a simpler model, fewer features, or an ensemble that averages many models (bagging, random forest)."],
+  ["biasvar", "How do you reduce high bias?", "A more flexible model, more informative features, or weaker regularization. More data alone rarely helps an underfitting model."],
+  ["biasvar", "Validation curve vs learning curve?", "- **Validation curve**: training and CV score against one hyperparameter (`ValidationCurveDisplay`)\n- **Learning curve**: training and CV score against training-set size (`LearningCurveDisplay`)"],
+  // ---- Decision trees ----
+  ["tree", "How does a decision tree make a prediction?", "It asks a chain of yes/no questions about one feature at a time (`Sex == female?`, `Age <= 9.5?`). The leaf it reaches predicts the majority class, or for regression the mean target, of the training samples in that leaf."],
+  ["tree", "How does a tree choose a split?", "It tries every feature and threshold and keeps the split whose children are purest: the largest drop in impurity, weighted by child size. It is **greedy**: the best split now, with no look-ahead."],
+  ["tree", "What is Gini impurity?", "`Gini = 1 − Σ p²` over the class proportions in a node.\n\n0 for a pure node, 0.5 at most for two balanced classes. `criterion=\"gini\"` is the default; `\"entropy\"` and `\"log_loss\"` are alternatives. Regression trees use `\"squared_error\"`."],
+  ["tree", "Do decision trees need feature scaling?", "No. Each split is a threshold on a single feature, and rescaling a feature does not change which rows fall on each side. The same holds for random forests."],
+  ["tree", "Why does a default `DecisionTreeClassifier` overfit?", "`max_depth=None` and `min_samples_leaf=1`: it keeps splitting until the leaves are pure, memorising noise. Training accuracy is close to 100%."],
+  ["tree", "Which hyperparameters pre-prune a tree?", "`max_depth`, `min_samples_split` (default 2), `min_samples_leaf` (default 1), `max_leaf_nodes`, `min_impurity_decrease`, `max_features`. They stop growth early."],
+  ["tree", "How does `ccp_alpha` regularize a tree?", "Cost-complexity **post-pruning**: grow the full tree, then cut the weakest branches, those whose impurity gain per extra leaf is below `ccp_alpha`. Larger values give smaller trees.\n\n`cost_complexity_pruning_path` lists candidate values; choose one by cross-validation."],
+  ["tree", "What does `feature_importances_` measure for a tree, and its caveats?", "The total impurity decrease each feature produced, normalised to sum to 1.\n\nCaveats: measured on training data, biased towards features with many distinct values, and credit is split arbitrarily between correlated features."],
+  ["tree", "Why are a fully grown tree's probabilities unreliable?", "`predict_proba` returns the class fractions in the leaf. A pure leaf gives 0 or 1, so the model sounds certain even when it is wrong."],
+  ["tree", "Can a regression tree predict beyond the training target range?", "No. Every prediction is the mean of a training leaf, so it is flat outside the training range. That matters for data with a trend, such as time series."],
+  ["tree", "Strengths and weaknesses of decision trees?", "- **Strengths**: easy to explain, no scaling, mixed feature types, captures interactions\n- **Weaknesses**: unstable (high variance), boundaries only parallel to the axes, greedy splits"],
+  ["tree", "How do you look inside a fitted tree?", "`sklearn.tree.plot_tree` draws it; `export_text` prints the rules as text."],
+  // ---- K-nearest neighbours ----
+  ["knn", "How does KNN classify a new point?", "Find the `n_neighbors` closest training points (default **5**) and take a majority vote. `KNeighborsRegressor` averages their target values instead."],
+  ["knn", "Why is KNN called a lazy learner?", "`fit` only stores the training data, plus a search index. The work happens at `predict`, which gets slow on large datasets."],
+  ["knn", "Small vs large `n_neighbors`?", "- Small k (k = 1): very flexible, overfits; training accuracy is 100%\n- Large k: smoother boundary, underfits; k = n always predicts the majority class\n\nChoose k by cross-validation."],
+  ["knn", "`weights=\"uniform\"` vs `weights=\"distance\"`?", "- `\"uniform\"` (default): every neighbour gets one equal vote\n- `\"distance\"`: votes are weighted by 1/distance, so close neighbours count more\n\nWith `\"distance\"`, training accuracy is 100%: each training point is its own neighbour at distance 0."],
+  ["knn", "Which distance does KNN use by default?", "`metric=\"minkowski\"` with `p=2`, which is Euclidean distance. `p=1` gives Manhattan distance."],
+  ["knn", "Why must features be scaled for KNN?", "Distances are dominated by the feature with the largest range. Income in euros would drown out age in years. Put `StandardScaler` in the pipeline."],
+  ["knn", "What does the `algorithm` parameter of KNN change?", "Only **how fast** neighbours are found, not the predictions: `\"auto\"` (default), `\"kd_tree\"`, `\"ball_tree\"`, `\"brute\"`.\n\n`\"auto\"` chooses brute force when there are more than 15 features, k is at least half the samples, or the input is sparse."],
+  ["knn", "Is tree-based indexing (KD-tree, ball tree) a different model?", "No. It is the same KNN with the same neighbours. The tree only speeds up the search by skipping regions that cannot contain a closer point."],
+  ["knn", "How does a KD-tree organise the data?", "It splits space again and again at the median of one feature, until each leaf holds at most `leaf_size` points (default 30). A search then visits only the regions that could hold a closer neighbour. It works best with few features."],
+  ["knn", "What is the curse of dimensionality for KNN?", "With many features, all points end up almost equally far apart, so \"nearest\" stops meaning \"similar\". Reduce the features (selection, PCA) or use another model."],
+  // ---- Support vector machines ----
+  ["svm", "What is the core idea of a support vector machine?", "Find the boundary that separates the classes with the **widest margin**: the widest street with the classes on either side."],
+  ["svm", "What are support vectors?", "The training points on the edge of the margin, inside it, or on the wrong side. They alone define the boundary: removing any other point changes nothing.\n\nSee them with `support_vectors_` and count them per class with `n_support_`."],
+  ["svm", "Is a new point classified by counting support vectors on each side?", "No. It is classified by which side of the boundary it falls on: the sign of `decision_function`. That value is a weighted sum of similarities to the support vectors plus an intercept."],
+  ["svm", "What does `C` control in an SVM?", "The penalty for points that violate the margin. Default 1.0.\n\n- Large C: narrow margin, few violations, risk of overfitting\n- Small C: wide margin, more violations allowed, **stronger** regularization"],
+  ["svm", "Wide vs narrow margin: effect on the result?", "- **Wide**: more robust to noise and outliers, more support vectors, some training errors accepted\n- **Narrow**: fits the training data closely, sensitive to single points"],
+  ["svm", "What is the kernel trick?", "It computes similarities as if the data had been mapped into a higher-dimensional space, without doing the mapping. That gives curved boundaries.\n\nKernels: `\"linear\"`, `\"poly\"`, `\"rbf\"` (default), `\"sigmoid\"`."],
+  ["svm", "What does `gamma` control in an RBF SVM?", "How far each training point's influence reaches. Large gamma: very local influence, wiggly boundary, overfitting. Small gamma: smooth boundary.\n\nDefault `gamma=\"scale\"`, which adapts to the number of features and their variance."],
+  ["svm", "Do SVMs need feature scaling?", "Yes. The margin and the RBF kernel are based on distances, so put `StandardScaler` in the pipeline."],
+  ["svm", "How do you get probabilities from `SVC` in scikit-learn 1.9?", "`probability=True` is deprecated in 1.9 and will be removed in 1.11. Use `CalibratedClassifierCV(SVC(), ensemble=False)` instead."],
+  ["svm", "`LinearSVC` vs `SVC(kernel=\"linear\")`?", "Both draw a linear boundary. `LinearSVC` scales far better to many samples. It uses a slightly different loss (`\"squared_hinge\"` by default), so its results differ a little."],
+  ["svm", "Why are kernel SVMs slow on large datasets?", "Training time grows roughly between the square and the cube of the number of samples, so beyond tens of thousands of rows they become impractical."],
+  ["svm", "What is `SVR`?", "Support vector regression. It fits a tube of width `epsilon` (default 0.1) around the data; errors inside the tube are ignored."],
+  // ---- Logistic regression ----
+  ["logreg", "Is logistic regression used for regression?", "No, despite the name it is a **classifier**. It computes a weighted sum of the features and passes it through the sigmoid to get a probability between 0 and 1."],
+  ["logreg", "What does the sigmoid function do?", "`σ(z) = 1 / (1 + e^(−z))`\n\nIt squeezes any number into the range 0 to 1, with z = 0 giving 0.5. `predict` returns class 1 when the probability is at least 0.5."],
+  ["logreg", "What shape is a logistic regression decision boundary?", "Linear: a line in 2D, a plane or hyperplane with more features. Curved boundaries need new features, such as polynomial terms."],
+  ["logreg", "How do you read a logistic regression coefficient?", "The change in the **log-odds** of class 1 per one-unit increase in the feature. `exp(coef)` is the odds ratio. Positive means a higher probability of class 1."],
+  ["logreg", "What does `C` mean in `LogisticRegression`?", "The **inverse** of regularization strength. Default 1.0; smaller C means stronger regularization.\n\nUnlike `LinearRegression`, logistic regression is regularized by default."],
+  ["logreg", "How do you choose L1 or L2 in scikit-learn 1.9?", "`penalty` is deprecated (since 1.8, removed in 1.10). Use `l1_ratio`:\n\n- `l1_ratio=0`: L2, the default\n- `l1_ratio=1`: L1, which needs `solver=\"liblinear\"` or `\"saga\"`\n- In between: elastic net, which needs `\"saga\"`\n- `C=np.inf`: no penalty"],
+  ["logreg", "What does a `ConvergenceWarning` from `LogisticRegression` mean?", "The solver (default `\"lbfgs\"`) stopped at `max_iter=100` before converging. Scale the features first, or raise `max_iter`."],
+  ["logreg", "How does `LogisticRegression` handle more than two classes?", "Automatically, with a multinomial (softmax) model. The old `multi_class` parameter has been removed."],
+  ["logreg", "Why scale features for logistic regression?", "The penalty treats all coefficients alike, so features must be on comparable scales. Scaling also helps the solver converge."],
+  // ---- Random forests ----
+  ["rf", "What is a random forest?", "Many decision trees, each trained on a bootstrap sample of the rows and considering a random subset of features at each split. The classifier averages the trees' probabilities; the regressor averages their predictions."],
+  ["rf", "Why does a forest beat a single tree?", "Each deep tree overfits in its own way. Averaging many different trees cancels much of that error: variance drops while bias stays about the same."],
+  ["rf", "What is a bootstrap sample?", "n rows drawn **with replacement** from n rows. About 63% of the distinct rows end up in it; the rest are \"out-of-bag\" for that tree."],
+  ["rf", "What does `oob_score=True` give you?", "Each tree is scored on the rows it did not see, which gives a free validation estimate without a separate split. Default `False`; it requires `bootstrap=True`."],
+  ["rf", "Default `max_features` in random forests?", "- `RandomForestClassifier`: `\"sqrt\"`\n- `RandomForestRegressor`: `1.0`, all features, which makes it plain bagging\n\nFewer features per split give more diverse trees."],
+  ["rf", "Does increasing `n_estimators` cause overfitting?", "No. More trees (default 100) only give diminishing returns and slower training. It is not a regularization setting; tune `max_depth`, `min_samples_leaf` or `max_features` instead."],
+  ["rf", "Do random forests need feature scaling?", "No. They are built from decision trees, which split on thresholds."],
+  ["rf", "Which feature importance should you trust for a random forest?", "The built-in `feature_importances_` is computed on training data and favours features with many distinct values. Prefer `permutation_importance` on held-out data, and group correlated features first."],
+  ["rf", "How do you speed up and reproduce a random forest?", "`n_jobs=-1` trains the trees in parallel; `random_state` fixes the bootstrap samples and feature choices."],
+  // ---- Regression basics and metrics ----
+  ["reg", "What is regression?", "Predicting a continuous number: a house price, or the disease-progression score in the diabetes dataset."],
+  ["reg", "MAE: what is it, and when is it useful?", "Mean absolute error: the average size of the errors, in the target's own units. Easy to explain and not dominated by a few large errors.\n\nLinear regression on the diabetes data: MAE 42.8."],
+  ["reg", "MSE vs RMSE?", "- **MSE**: average squared error, in squared units; large errors count heavily\n- **RMSE**: square root of MSE, back in the target's units. Always ≥ MAE; a big gap means some large errors\n\n`root_mean_squared_error` is in `sklearn.metrics`."],
+  ["reg", "What should you know about MAPE?", "Mean absolute percentage error. scikit-learn returns a **fraction**: 0.37 means 37%. It explodes when actual values are near zero."],
+  ["reg", "What does R² measure?", "`R² = 1 − SS_residual / SS_total`\n\nThe share of variance explained, compared with always predicting the mean. 1 is perfect, 0 is no better than the mean. It is what `score()` returns for regressors."],
+  ["reg", "Can R² be negative?", "Yes, on new data, when the model is worse than predicting the mean. Example: `r2_score([1, 2, 3], [3, 3, 0])` is −6."],
+  ["reg", "What does `DummyRegressor()` predict?", "The mean of the training target for every row (`strategy=\"mean\"`), so its test R² is about 0.\n\nDiabetes data: dummy MAE 64.0 vs linear regression 42.8."],
+  ["reg", "Why are regression scoring strings negative, like `\"neg_mean_absolute_error\"`?", "scikit-learn always maximises the score. Errors are negated so that higher is better, which is why `best_score_` can be −42.8."],
+  ["reg", "How should you judge whether an error is large?", "Against a baseline and against the target's spread. On diabetes the target's standard deviation is 77, so an MAE of 42.8 is about half of it: useful, but far from precise."],
+  ["reg", "Which plots diagnose a regression model?", "- Predicted vs actual: points close to the diagonal\n- Residuals vs predicted: no pattern, constant spread\n\n`PredictionErrorDisplay` draws both."],
+  ["reg", "What does the diabetes dataset's target mean?", "A progression score one year after the measurements; higher means more progression. All 442 patients already have diabetes, and the score's unit is not documented, so read it relative to its spread (25 to 346, mean 152)."],
+  // ---- Linear regression ----
+  ["linreg", "What does linear regression predict?", "`ŷ = intercept + b₁·x₁ + b₂·x₂ + … + bₙ·xₙ`\n\nA weighted sum of the features: a straight line with one feature, a plane or hyperplane with more."],
+  ["linreg", "How does `LinearRegression` find its coefficients?", "Ordinary least squares: the coefficients that minimise the sum of squared residuals. There is a direct solution, no hyperparameters and **no regularization**."],
+  ["linreg", "What do `coef_` and `intercept_` mean?", "- `coef_`: the change in prediction for +1 unit of a feature, **holding all other features fixed**\n- `intercept_`: the prediction when every feature is 0, often meaningless (−341 on the raw diabetes data)"],
+  ["linreg", "What is a standardized coefficient?", "The change in prediction for +1 **standard deviation** of the feature: raw coefficient × the feature's SD. Diabetes BMI: 5.85 per BMI point × 4.38 = 25.6 per SD. It makes features comparable."],
+  ["linreg", "Does `StandardScaler` change the predictions of `LinearRegression`?", "No, only how the coefficients read. The intercept becomes the mean of `y_train`. Scaling does matter for Ridge, Lasso, KNN and SVM."],
+  ["linreg", "Does a negative coefficient mean a negative correlation?", "No. The coefficient is the effect with the other features held fixed; correlation looks at one feature alone.\n\nDiabetes `s1` (total cholesterol): correlation +0.20, coefficient −44."],
+  ["linreg", "What is collinearity, and what does it break?", "One feature can be predicted from the others, so they carry the same information. Predictions stay fine, but individual coefficients become unstable: large, cancelling, even with flipped signs.\n\nDiabetes `s1` and `s2`: correlation 0.90."],
+  ["linreg", "What is the VIF?", "Variance inflation factor: `VIF = 1 / (1 − R²)`, where R² comes from predicting the feature from all the other features. Above 5 deserves attention, above 10 is a problem. Diabetes `s1`: 59."],
+  ["linreg", "How do you judge feature importance when features are collinear?", "Group the collinear features, then measure the drop in cross-validated score when a group is removed, or a Shapley-style fair share. Permutation importance can mislead with correlated features."],
+  ["linreg", "What does Ridge regression add?", "An L2 penalty: `alpha × Σ coef²`. All coefficients shrink and none become exactly zero, and correlated features share the effect. Default `alpha=1.0`; larger means stronger."],
+  ["linreg", "What does Lasso add?", "An L1 penalty: `alpha × Σ |coef|`. It sets some coefficients to **exactly zero**, which is built-in feature selection. Among correlated features it keeps one fairly arbitrarily.\n\n`ElasticNet` mixes L1 and L2 (`l1_ratio=0.5` by default)."],
+  ["linreg", "Why scale features before Ridge or Lasso?", "The penalty treats every coefficient alike. Unscaled features with small units would need large coefficients and be punished unfairly."],
+  ["linreg", "Can linear regression fit a curve?", "Yes, with engineered features such as `PolynomialFeatures`. The model stays linear in its coefficients."],
+  ["linreg", "What are the assumptions behind linear regression?", "A linear relationship; errors that are independent with constant spread (roughly normal, for confidence intervals); no strong collinearity, if you want to interpret coefficients. Check them with residual plots."],
+  ["linreg", "What is the dummy variable trap?", "One-hot encoding every category and keeping the intercept creates perfect collinearity: the columns always sum to 1. Use `drop=\"first\"` or regularization."],
+  ["linreg", "Do coefficients show what causes the outcome?", "No. They describe associations in this data. \"BMI has a positive coefficient\" does not prove that lowering BMI slows the disease."],
 ].map(c => ({ id: c[0] + "-" + hash(c[1]), deck: c[0], q: c[1], a: c[2] }));
 
 const deckById = Object.fromEntries(DECKS.map(d => [d.id, d]));
@@ -556,6 +743,18 @@ function setDecks(ids) {
 function drawMap() {
   const svg = $("map"), NS = "http://www.w3.org/2000/svg";
   svg.innerHTML = "";
+  const dim = layoutMap(NARROW.matches ? 540 : 1270);
+  svg.setAttribute("viewBox", "0 0 " + dim.w + " " + dim.h);
+  GPOS.forEach(p => {
+    const l = document.createElementNS(NS, "line");
+    l.setAttribute("class", "gline"); l.setAttribute("x1", p.x + 6); l.setAttribute("x2", p.x + 6); l.setAttribute("y1", p.y0 + 4); l.setAttribute("y2", p.y0 + p.h - 4);
+    svg.appendChild(l);
+    const t = document.createElementNS(NS, "text"), cy = p.y0 + p.h / 2;
+    t.setAttribute("class", "glab"); t.setAttribute("x", p.x); t.setAttribute("y", cy); t.setAttribute("text-anchor", "middle");
+    t.setAttribute("transform", "rotate(-90 " + p.x + " " + cy + ")");
+    t.textContent = p.g.name.length > 26 ? (p.g.short || p.g.name) : p.g.name;
+    svg.appendChild(t);
+  });
   DECKS.forEach(d => {
     const [cx, cy] = POS[d.id], cards = cardsOf(d.id), on = state.decks.has(d.id);
     const g = document.createElementNS(NS, "g");
