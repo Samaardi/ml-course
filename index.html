@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="description" content="350 flashcards on machine learning with scikit-learn: preprocessing, clustering, dimensionality reduction, classification (decision trees, KNN, SVM, logistic regression, random forests), model evaluation and regression. Built for the scikit-learn Associate Practitioner exam.">
+<meta name="description" content="393 flashcards on machine learning with scikit-learn: preprocessing, clustering, dimensionality reduction, classification (decision trees, KNN, SVM, logistic regression, random forests), model evaluation, regression with Ridge, Lasso and ElasticNet, feature engineering and feature selection. Built for the scikit-learn Associate Practitioner exam.">
 <title>Machine Learning Flashcards</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%231E4F7A'/%3E%3Ccircle cx='10' cy='11' r='3' fill='%23fff'/%3E%3Ccircle cx='15' cy='9' r='2.2' fill='%23fff' opacity='.7'/%3E%3Ccircle cx='21' cy='21' r='3' fill='%23fff'/%3E%3Ccircle cx='24' cy='16' r='2.2' fill='%23fff' opacity='.7'/%3E%3Ccircle cx='11' cy='22' r='1.8' fill='%23fff' opacity='.45'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -27,6 +27,7 @@
   --c-sml: #3B5BA9; --c-prep: #0F766E; --c-metrics: #A15C07; --c-cv: #5B4BA8; --c-biasvar: #8A3B12;
   --c-tree: #3F6212; --c-knn: #0369A1; --c-svm: #9F1239; --c-logreg: #6D28D9; --c-rf: #166534;
   --c-reg: #9A3412; --c-linreg: #1E40AF; --c-ts: #854D0E;
+  --c-regul: #0E7490; --c-fsel: #7C2D12; --c-feng: #4338CA;
   --shadow: 0 1px 2px rgba(23,32,43,.05), 0 6px 20px rgba(23,32,43,.07);
   --f-serif: "Newsreader", "Iowan Old Style", Georgia, serif;
   --f-sans: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
@@ -42,6 +43,7 @@
     --c-sml: #8EA6E8; --c-prep: #5CCDBF; --c-metrics: #E9A752; --c-cv: #A99CF0; --c-biasvar: #E59A6E;
     --c-tree: #A6CF6B; --c-knn: #6CC0EE; --c-svm: #F28BA8; --c-logreg: #C4A5F8; --c-rf: #74D39A;
     --c-reg: #F3A27A; --c-linreg: #93B0F5; --c-ts: #E7BE6C;
+    --c-regul: #5DCBE3; --c-fsel: #EBA27F; --c-feng: #A5B4FC;
     --shadow: 0 1px 2px rgba(0,0,0,.3), 0 10px 28px rgba(0,0,0,.35);
     color-scheme: dark;
   }
@@ -219,10 +221,10 @@ footer .linkbtn { font-size: 13px; }
   <header class="top">
     <div>
       <h1>Machine Learning Flashcards</h1>
-      <p class="lede">Core concepts, hyperparameters and scikit-learn behaviour for supervised and unsupervised learning: preprocessing, clustering, dimensionality reduction, classification and regression, in <strong>350 cards</strong>. Written to prepare for the scikit-learn Associate Practitioner exam, and useful as a quick refresher.</p>
+      <p class="lede">Core concepts, hyperparameters and scikit-learn behaviour for supervised and unsupervised learning: preprocessing, clustering, dimensionality reduction, classification, regression, feature engineering and selection, in <strong>393 cards</strong>. Written to prepare for the scikit-learn Associate Practitioner exam, and useful as a quick refresher.</p>
     </div>
     <figure class="map" aria-label="Your progress: one cluster per deck, one dot per card">
-      <svg id="map" viewBox="0 0 1260 184" role="group"></svg>
+      <svg id="map" viewBox="0 0 1334 184" role="group"></svg>
       <figcaption><span><i class="lg k"></i>Known</span><span><i class="lg a"></i>Review again</span><span><i class="lg u"></i>Not seen yet</span><span>Click a cluster to study that deck</span></figcaption>
     </figure>
   </header>
@@ -269,7 +271,8 @@ const GROUPS = [
   { name: "Dimensionality reduction", decks: ["pca", "tsne"] },
   { name: "Supervised learning and evaluation", short: "Supervised basics", decks: ["sml", "metrics", "cv", "biasvar"] },
   { name: "Classification algorithms", short: "Classifiers", decks: ["tree", "knn", "svm", "logreg", "rf"] },
-  { name: "Regression", decks: ["reg", "linreg"] },
+  { name: "Regression", decks: ["reg", "linreg", "regul"] },
+  { name: "Feature engineering and selection", short: "Features", decks: ["feng", "fsel"] },
 ];
 const DECKS = [
   { id: "ml", name: "What is ML?" },
@@ -297,6 +300,9 @@ const DECKS = [
   { id: "rf", name: "Random forests", short: "Forests" },
   { id: "reg", name: "Regression basics and metrics", short: "Reg. basics" },
   { id: "linreg", name: "Linear regression", short: "Linear" },
+  { id: "regul", name: "Ridge, Lasso and ElasticNet", short: "Regularized" },
+  { id: "feng", name: "Feature engineering", short: "Engineering" },
+  { id: "fsel", name: "Feature selection", short: "Selection" },
 ];
 // Progress map: groups flow left to right, two decks per column, each group with a vertical label; wraps on narrow screens.
 const NARROW = window.matchMedia("(max-width: 700px)");
@@ -689,13 +695,59 @@ const CARDS = [
   ["linreg", "What is collinearity, and what does it break?", "One feature can be predicted from the others, so they carry the same information. Predictions stay fine, but individual coefficients become unstable: large, cancelling, even with flipped signs.\n\nDiabetes `s1` and `s2`: correlation 0.90."],
   ["linreg", "What is the VIF?", "Variance inflation factor: `VIF = 1 / (1 − R²)`, where R² comes from predicting the feature from all the other features. Above 5 deserves attention, above 10 is a problem. Diabetes `s1`: 59."],
   ["linreg", "How do you judge feature importance when features are collinear?", "Group the collinear features, then measure the drop in cross-validated score when a group is removed, or a Shapley-style fair share. Permutation importance can mislead with correlated features."],
-  ["linreg", "What does Ridge regression add?", "An L2 penalty: `alpha × Σ coef²`. All coefficients shrink and none become exactly zero, and correlated features share the effect. Default `alpha=1.0`; larger means stronger."],
-  ["linreg", "What does Lasso add?", "An L1 penalty: `alpha × Σ |coef|`. It sets some coefficients to **exactly zero**, which is built-in feature selection. Among correlated features it keeps one fairly arbitrarily.\n\n`ElasticNet` mixes L1 and L2 (`l1_ratio=0.5` by default)."],
-  ["linreg", "Why scale features before Ridge or Lasso?", "The penalty treats every coefficient alike. Unscaled features with small units would need large coefficients and be punished unfairly."],
-  ["linreg", "Can linear regression fit a curve?", "Yes, with engineered features such as `PolynomialFeatures`. The model stays linear in its coefficients."],
   ["linreg", "What are the assumptions behind linear regression?", "A linear relationship; errors that are independent with constant spread (roughly normal, for confidence intervals); no strong collinearity, if you want to interpret coefficients. Check them with residual plots."],
   ["linreg", "What is the dummy variable trap?", "One-hot encoding every category and keeping the intercept creates perfect collinearity: the columns always sum to 1. Use `drop=\"first\"` or regularization."],
   ["linreg", "Do coefficients show what causes the outcome?", "No. They describe associations in this data. \"BMI has a positive coefficient\" does not prove that lowering BMI slows the disease."],
+  // ---- Ridge, Lasso and ElasticNet ----
+  ["regul", "Why regularize a linear model?", "To reduce variance. With many features, correlated features or few samples, plain least squares can give large, unstable coefficients that fit noise. A penalty on coefficient size trades a little bias for much less variance."],
+  ["regul", "What does Ridge regression add?", "An L2 penalty: `alpha × Σ coef²`. All coefficients shrink and none become exactly zero, and correlated features share the effect. Default `alpha=1.0`; larger means stronger."],
+  ["regul", "What does Lasso add?", "An L1 penalty: `alpha × Σ |coef|`. It sets some coefficients to **exactly zero**, which is built-in feature selection. Among correlated features it keeps one fairly arbitrarily.\n\n`ElasticNet` mixes L1 and L2 (`l1_ratio=0.5` by default)."],
+  ["regul", "Why scale features before Ridge or Lasso?", "The penalty treats every coefficient alike. Unscaled features with small units would need large coefficients and be punished unfairly."],
+  ["regul", "What does ElasticNet add?", "A mix of the L1 (Lasso) and L2 (Ridge) penalties. `alpha` sets the overall strength, `l1_ratio` the mix (default 0.5).\n\n- `l1_ratio=1`: pure Lasso\n- `l1_ratio` near 0: mostly Ridge\n\nIt can set coefficients to zero like Lasso, while handling correlated features more like Ridge."],
+  ["regul", "Ridge, Lasso or ElasticNet: which suits correlated features?", "- **Ridge** spreads the effect across the correlated features and keeps them all\n- **Lasso** keeps one of them, fairly arbitrarily, and zeroes the rest\n- **ElasticNet** tends to keep or drop the group together"],
+  ["regul", "What happens to the coefficients as `alpha` grows?", "They shrink towards zero. With Lasso they hit exactly 0 one after another; with Ridge they shrink smoothly but stay non-zero. A plot of this is called a **coefficient path**."],
+  ["regul", "What does a very large `alpha` do to predictions?", "All coefficients go to (nearly) zero, so every prediction is close to the training mean of `y`. The intercept is never penalized."],
+  ["regul", "What about `alpha=0`?", "No penalty: plain least squares. Use `LinearRegression` instead; `Lasso(alpha=0)` warns that it does not converge well."],
+  ["regul", "Is `alpha=10` equally strong in Ridge and Lasso?", "No. Lasso and ElasticNet divide the squared error by 2 × n_samples; Ridge does not. So the same `alpha` is a far stronger penalty in Lasso. Tune each model's `alpha` separately."],
+  ["regul", "How do you choose `alpha`?", "With cross-validation over a **log scale**, such as `np.logspace(-3, 3, 30)`, using `GridSearchCV` or the built-in CV estimators: `RidgeCV`, `LassoCV`, `ElasticNetCV`. The chosen value is in `alpha_`."],
+  ["regul", "What are the defaults of `RidgeCV` and `LassoCV`?", "- `RidgeCV`: tries `alphas=(0.1, 1.0, 10.0)` with an efficient leave-one-out CV\n- `LassoCV`: builds a path of 100 alphas automatically and uses 5-fold CV\n\n`ElasticNetCV` also tunes `l1_ratio` if you pass a list (default 0.5)."],
+  ["regul", "What does a `ConvergenceWarning` from `Lasso` mean?", "The coordinate-descent solver stopped at `max_iter=1000` before converging. Scale the features, raise `max_iter`, or use a larger `alpha`."],
+  ["regul", "When does regularization barely improve predictions?", "When there are few features compared with samples, so plain least squares hardly overfits. Diabetes data (10 features, 353 training rows): linear regression, Ridge, Lasso and ElasticNet all reach test R² ≈ 0.45. The gain there is stabler coefficients."],
+  ["regul", "Does regularization protect against outliers?", "No. The penalty acts on the coefficients, not on the errors. For outliers use a robust loss, such as `HuberRegressor`."],
+  ["regul", "How do `alpha` in Ridge and `C` in `LogisticRegression` compare?", "Both control regularization strength, in opposite directions:\n\n- Ridge `alpha`: larger = stronger\n- Logistic regression `C`: larger = **weaker** (C is the inverse)"],
+  // ---- Feature engineering ----
+  ["feng", "What is feature engineering?", "Creating or transforming features so the model can use patterns it could not see before: squares, interactions, bins, logs, ratios, date parts. It often helps more than switching models."],
+  ["feng", "Can linear regression fit a curve?", "Yes, with engineered features such as `PolynomialFeatures`. The model stays linear in its coefficients."],
+  ["feng", "What does `PolynomialFeatures` create?", "Powers and products of the features. With `a` and `b` at `degree=2` (default): 1, a, b, a², a·b, b².\n\n`include_bias=True` adds the column of ones; set it to `False` before `LinearRegression`, which fits its own intercept."],
+  ["feng", "What does `interaction_only=True` do in `PolynomialFeatures`?", "Keeps only the products of different features (a·b, a·c, b·c), no squares. An interaction lets the effect of one feature depend on another."],
+  ["feng", "Why combine `PolynomialFeatures` with scaling and regularization?", "The number of columns explodes: 10 features give 65 at degree 2 and 285 at degree 3. Squares and products are on very different scales and strongly correlated. Scale **after** expanding, and use Ridge or Lasso."],
+  ["feng", "What does `SplineTransformer` do?", "Builds smooth piecewise polynomials over each feature: a flexible curve without the wild ends of high-degree polynomials. Defaults `n_knots=5`, `degree=3` give 7 columns per feature. `extrapolation=\"periodic\"` suits cyclical features."],
+  ["feng", "What does `KBinsDiscretizer` do?", "Cuts a numeric feature into intervals. Defaults: `n_bins=5`, `strategy=\"quantile\"` (equal counts per bin), `encode=\"onehot\"`. A linear model can then learn a step-shaped effect."],
+  ["feng", "How do you log-transform a skewed feature inside a pipeline?", "`FunctionTransformer(np.log1p)`. `log1p` computes log(1 + x), so zeros are allowed."],
+  ["feng", "How do you model a skewed target, such as prices?", "`TransformedTargetRegressor(regressor=..., func=np.log1p, inverse_func=np.expm1)`. The model learns on the log scale and predictions come back in the original units."],
+  ["feng", "How can you turn dates into features?", "Extract parts: hour, weekday, month, holiday flag. For cyclical parts, encode with sine and cosine (or a periodic spline) so that December sits next to January."],
+  ["feng", "What are domain features? Give an example.", "Features built from knowledge of the problem: price per square metre, BMI = weight / height², debt-to-income ratio. A good ratio can capture what a model would need many splits or terms to learn."],
+  ["feng", "How can K-means create features for a supervised model?", "Put `KMeans` inside the pipeline: its `transform` returns each sample's distance to every centroid, and those distances become new features for the next model."],
+  ["feng", "How do you encode a category with many levels using the target?", "`TargetEncoder` replaces each category with a smoothed mean of the target. It uses cross-fitting (default `cv=5`) during `fit_transform` to avoid leaking each row's own target."],
+  ["feng", "Which models benefit most from feature engineering?", "Linear models: they can only add up their inputs, so curves and interactions must be built as features. Tree-based models find non-linear patterns and interactions themselves, but cannot extrapolate beyond the training range."],
+  ["feng", "Where should feature engineering steps go?", "Inside the pipeline, so anything learned from data (bin edges, spline knots, target means) is fitted on the training folds only."],
+  // ---- Feature selection ----
+  ["fsel", "Why select features?", "Simpler and faster models, less overfitting with many noisy features, easier explanation, and cheaper data collection. Often accuracy stays about the same with far fewer features."],
+  ["fsel", "Filter, embedded and wrapper methods?", "- **Filter**: score each feature without a model (`SelectKBest`, `VarianceThreshold`); very fast\n- **Embedded**: the model selects while training (`SelectFromModel` with Lasso)\n- **Wrapper**: fit models repeatedly on feature subsets (`RFE`, `SequentialFeatureSelector`); slow"],
+  ["fsel", "What does `VarianceThreshold` do?", "Removes features whose variance is at most `threshold` (default 0: constant columns). It ignores the target, so it is the simplest filter."],
+  ["fsel", "What does `SelectKBest` do, and what are its defaults?", "Scores every feature with `score_func` and keeps the `k` best. Defaults: `k=10` and `score_func=f_classif`, which is for **classification**. For regression, set `f_regression` or `mutual_info_regression`.\n\n`SelectPercentile` keeps a percentage instead (default 10%)."],
+  ["fsel", "Which score functions go with which task?", "- Classification: `f_classif`, `chi2`, `mutual_info_classif`\n- Regression: `f_regression`, `mutual_info_regression`\n\nF-tests detect linear relationships only; mutual information also detects non-linear ones. `chi2` needs non-negative features (use `MinMaxScaler`, not `StandardScaler`)."],
+  ["fsel", "What are the weaknesses of univariate filters like `SelectKBest`?", "Each feature is judged alone, so they keep **redundant** features (several that all measure the same thing) and miss features that only help **together** with others."],
+  ["fsel", "How does `SelectFromModel` decide which features to keep?", "It fits a model and keeps features whose `|coef_|` or `feature_importances_` is at least `threshold`.\n\nDefault threshold: the **mean** importance, but **1e-5** for L1 models such as Lasso (in effect, \"non-zero\"). Also accepts `\"median\"`, `\"1.25*mean\"` or `max_features`."],
+  ["fsel", "How does RFE work?", "Recursive feature elimination: fit the model, remove the weakest feature (smallest `|coef_|` or importance), refit, and repeat until `n_features_to_select` remain. Default: half the features, removing `step=1` per round.\n\n`ranking_` shows the order: 1 = kept."],
+  ["fsel", "Does RFE choose features by model performance?", "No, by coefficient size or importance. Performance enters only if you tune `n_features_to_select` with CV, or use `RFECV`, which picks the number of features by cross-validation."],
+  ["fsel", "How does `SequentialFeatureSelector` work?", "Greedy search by **CV score**: forward selection (default) adds, one at a time, the feature that improves the score most; `direction=\"backward\"` removes instead. Default `n_features_to_select=\"auto\"` keeps half. Accurate but slow: many model fits."],
+  ["fsel", "Where does feature selection go, and why?", "Inside the pipeline, after preprocessing and before the model. Selecting on the full dataset before cross-validation is leakage: even pure-noise features can then look predictive."],
+  ["fsel", "How do you tune a selector in `GridSearchCV`?", "Through the step name:\n\n- `select__k` for `SelectKBest`\n- `select__estimator__alpha` for the Lasso inside `SelectFromModel`\n- `select__n_features_to_select` for RFE"],
+  ["fsel", "How do you see which features a fitted selector kept?", "`get_support()` returns a True/False mask; `get_feature_names_out()` returns the names of the kept columns."],
+  ["fsel", "Why can RFE rank one-hot columns arbitrarily?", "With every category one-hot encoded plus an intercept, the dummy columns are perfectly collinear, so the coefficients are not unique. Use `OneHotEncoder(drop=\"first\")` or a regularized model such as Ridge inside RFE."],
+  ["fsel", "A selector keeps some one-hot columns of `make` but not others. What happens to the dropped makes?", "Their rows become all zeros in the kept `make` columns, so they are merged into the baseline group. Fine for prediction, but say so when explaining the model."],
+  ["fsel", "Feature selection raised CV R² from 0.829 to 0.845. Is that a real gain?", "Not necessarily. The best of many settings (every k from 1 to 63) is optimistic by chance, and on small data the fold-to-fold spread is often larger than the gain. Check on a held-out test set or with nested CV."],
 ].map(c => ({ id: c[0] + "-" + hash(c[1]), deck: c[0], q: c[1], a: c[2] }));
 
 const deckById = Object.fromEntries(DECKS.map(d => [d.id, d]));
@@ -743,7 +795,7 @@ function setDecks(ids) {
 function drawMap() {
   const svg = $("map"), NS = "http://www.w3.org/2000/svg";
   svg.innerHTML = "";
-  const dim = layoutMap(NARROW.matches ? 540 : 1270);
+  const dim = layoutMap(NARROW.matches ? 540 : 1340);
   svg.setAttribute("viewBox", "0 0 " + dim.w + " " + dim.h);
   GPOS.forEach(p => {
     const l = document.createElementNS(NS, "line");
